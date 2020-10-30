@@ -1,0 +1,38 @@
+<launch>
+     <arg name="test_serial_urdf" default="true" doc="True if we visualize the Serialized Delta Arm for Moveit"/>
+
+     <arg name="urdf_for_pybullet" default="$(find xacro)/xacro --inorder $(find omnid)/urdf/delta_robot.urdf.xacro
+       R_base:=0.18
+       h_base:=0.009525
+       M_base:=2.5
+       R_platform:=0.062
+       h_platform:=0.01
+       M_platform:=0.5
+       L_lower:=0.200
+       L_upper:=0.368
+       base_offset:=0.046375
+       "/>
+    <arg name="urdf_serial" default="$(find xacro)/xacro --inorder $(find omnid)/urdf/delta_robot_for_moveit.urdf.xacro
+       R_base:=0.18
+       h_base:=0.009525
+       M_base:=2.5
+       R_platform:=0.062
+       h_platform:=0.01
+       M_platform:=0.5
+       L_lower:=0.200
+       L_upper:=0.368
+       base_offset:=0.046375
+       "/>
+    <param name="robot_description" command="$(arg urdf_for_pybullet)" unless="$(arg test_serial_urdf)"/>
+    <param name="robot_description" command="$(arg urdf_serial)" if="$(arg test_serial_urdf)"/>
+
+
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+    <arg name="use_jsp_gui" default = "true" doc="Launch the joint_state_publisher gui to publish joint angles"/>
+    <node name="joint_state_publisher_gui" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" if="$(arg use_jsp_gui)"/>
+    <node pkg="rviz" type="rviz" name="rviz" required="true" args="-d $(find omnid)/rviz/delta_arm.urdf.rviz"/>
+
+<!--    </group>-->
+
+
+</launch>

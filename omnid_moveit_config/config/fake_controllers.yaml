@@ -1,0 +1,12 @@
+controller_list:
+  - name: fake_end_effector_controller
+    joints:
+      - z
+  - name: fake_end_effector_arm_controller
+    joints:
+      - x
+      - y
+      - z
+initial:  # Define initial robot poses.
+  - group: end_effector
+    pose: home

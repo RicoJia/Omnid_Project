@@ -1,0 +1,148 @@
+<?xml version="1.0"?>
+<!--Description: this is a simple chain robot whose natural pose is a chain along the y axis-->
+<!--Note: Each link should have the contact block, and the recommended values from Erwin Counmans, the PyBullet Creator, stiffness=30000 and damping=1000   -->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="diff_drive">
+    <xacro:property name="diff_params" value="${load_yaml('$(find nuturtle_description)/config/diff_params.yaml')}" />
+    <xacro:property name="mass_length" value="0.1"/>
+    <xacro:property name="massless_length" value="1.0"/>
+    <xacro:property name="spring_diameter" value="0.1"/>
+
+    <xacro:property name="grey_mat">
+     <material name="arm_grey_mat">
+       <color rgba="0.75 0.75 0.75 1.0" />
+     </material>
+    </xacro:property>
+
+    <xacro:property name="yellow_mat">
+     <material name="arm_yellow_mat">
+       <color rgba="1 1 0 1.0" />
+     </material>
+    </xacro:property>
+
+    <xacro:property name="pink_mat">
+     <material name="arm_pink_mat">
+       <color rgba="1.0 0.42 0.72 1.0" />
+     </material>
+    </xacro:property>
+
+    <xacro:macro name="_joint" params="name type origin_xyz origin_rpy parent child axis">
+        <joint name="${name}" type="${type}">
+        <origin rpy="${origin_rpy}" xyz="${origin_xyz}"/>
+        <parent link="${parent}" />
+        <child link="${child}" />
+        <dynamics damping="0.0" friction="0.0"/>
+        <limit effort="10000" velocity="10000" lower="1000" upper="-1000" />
+        <xacro:if value="${type=='continuous'}">
+        <axis xyz="${axis}"/>
+        </xacro:if>
+        </joint>
+    </xacro:macro>
+
+    <xacro:macro name="block_with_unit_mass" params="name">
+        <link name="${name}">
+            <visual>
+                <origin xyz="${mass_length/2.0} 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <box size="${mass_length} 0.1 0.1"/>
+                </geometry>
+                <xacro:insert_block name="yellow_mat"/>
+            </visual>
+            <inertial>
+                <mass value="1.0" />
+                <inertia ixx="0.0016666" ixy="0.0" ixz="0.0"
+                         iyy="0.0016666" iyz="0.0"
+                         izz="0.0016666" />
+            </inertial>
+            <collision>
+                <origin xyz="${mass_length/2.0} 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <box size="${mass_length} 0.1 0.1"/>
+                </geometry>
+            </collision>
+            <contact>
+                <rolling_friction value="0.0"/>
+                <spinning_friction value="0.0"/>
+                <stiffness value="30000.0"/>
+                <damping value="1000.0"/>
+                <lateral_friction value="0.0"/>
+            </contact>
+        </link>
+    </xacro:macro>
+
+    <xacro:macro name="block_with_no_mass" params="name">
+        <link name="${name}">
+            <visual>
+                <origin xyz="${massless_length/2.0} 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <box size="${massless_length} 0.1 0.1"/>
+                </geometry>
+                <xacro:insert_block name="pink_mat"/>
+            </visual>
+            <inertial>
+                <mass value="0.00001" />
+                <inertia ixx="0.000000002" ixy="0.0" ixz="0.0"
+                         iyy="0.000000084" iyz="0.0"
+                         izz="0.000000084" />
+            </inertial>
+            <collision>
+                <origin xyz="${massless_length/2.0} 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <box size="${massless_length} 0.1 0.1"/>
+                </geometry>
+            </collision>
+            <contact>
+                <rolling_friction value="0.0"/>
+                <spinning_friction value="0.0"/>
+                <stiffness value="30000.0"/>
+                <damping value="1000.0"/>
+                <lateral_friction value="0.0"/>
+            </contact>
+        </link>
+    </xacro:macro>
+
+
+    <xacro:block_with_unit_mass
+            name="base_link"
+    />
+
+    <xacro:_joint
+            name="base_link_arm1"
+            type="fixed"
+            origin_xyz ="${mass_length} 0 0" origin_rpy="0.0 0.0 0.0"
+            parent = "base_link"
+            child = "arm1"
+            axis = "0 0 1"
+    />
+
+    <xacro:block_with_no_mass
+            name="arm1"
+    />
+
+    <xacro:_joint
+            name="spring_joint"
+            type="continuous"
+            origin_xyz ="${massless_length} 0 0" origin_rpy="0.0 0.0 0.0"
+            parent = "arm1"
+            child = "arm2"
+            axis = "0 0 1"
+    />
+
+    <xacro:block_with_no_mass
+            name="arm2"
+    />
+
+    <xacro:_joint
+            name="arm2_end_effector"
+            type="fixed"
+            origin_xyz ="${massless_length} 0 0" origin_rpy="0.0 0.0 0.0"
+            parent = "arm2"
+            child = "end_effector"
+            axis = "0 0 1"
+    />
+
+    <xacro:block_with_unit_mass
+            name="end_effector"
+    />
+
+</robot>
+

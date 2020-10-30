@@ -1,0 +1,14 @@
+controller_list:
+  - name: end_effector_arm_controller
+    action_ns: follow_joint_trajectory
+    type: FollowJointTrajectory
+    joints:
+      - theta_1
+      - theta_2
+      - theta_3
+      - x
+      - y
+      - z
+initial:  # Define initial robot poses.
+  - group: end_effector
+    pose: home

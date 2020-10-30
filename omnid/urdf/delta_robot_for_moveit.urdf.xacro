@@ -1,0 +1,369 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="delta-robot-RUU">
+
+  <!--  IMPORTANT NOTE: This URDF is for Moveit! use only, as it contains redundant joint to "serialize" the Delta Arm-->
+
+  <!-- These parameters are stored in parameters.h and are passed in
+       by calling delta_parameters at the commandline when generated the
+       urdf from this xacro file, via arg:=value
+Note that since this is a parallel robot it can't fully be captured by a urdf
+Instead, the user must make sure the loop closure constraints are satisfied.
+TODO: not all the properties are in the c header file yet and the command
+line program has not been written
+-->
+
+  <!-- Radius of the base of the delta robot -->
+  <xacro:property name="R_base" value="$(arg R_base)" />
+
+  <!-- height (i.e. thickness) of the base -->
+  <xacro:property name="h_base" value="$(arg h_base)" />
+
+  <!-- mass of the base -->
+  <xacro:property name="M_base" value="$(arg M_base)" />
+
+
+  <!-- Radius of the platform (i.e. end-effector) of the delta robot -->
+  <xacro:property name="R_platform" value="$(arg R_platform)" />
+
+  <!-- height (i.e. thickness) of the platform -->
+  <xacro:property name="h_platform" value="$(arg h_platform)" />
+
+  <!-- Mass of the platform (i.e. end-effector) of the delta robot -->
+  <xacro:property name="M_platform" value="$(arg M_platform)" />
+
+  <!-- Length of the lower leg -->
+  <xacro:property name="L_lower" value="$(arg L_lower)" />
+
+  <!-- Mass of the lower leg -->
+  <xacro:property name="M_lower" value="1" />
+
+  <!-- radius of lower leg cylinder -->
+  <xacro:property name="R_lower" value=".009" />
+
+  <xacro:property name="L_upper" value="$(arg L_upper)" />
+
+  <!-- Mass of the upper leg -->
+  <xacro:property name="M_upper" value="1" />
+
+  <!-- radius of upper leg cylinder -->
+  <xacro:property name="R_upper" value=".009" />
+
+  <!-- Properties of the pre-spring link. Currently these are specified directly
+       in this file because they are not used by C code. The prespring links
+       are cylindrical with axes aligned with the joint axis-->
+  <!-- pre spring mass -->
+  <xacro:property name="M_prespring" value="1" />
+
+  <!-- pre spring cylinder radius -->
+  <xacro:property name="R_prespring" value="0.02" />
+
+  <!-- pre spring cylinder thickness -->
+  <xacro:property name="h_prespring" value="0.01" />
+
+  <!-- distance of the pre-spring mass from the lower arm joint -->
+  <xacro:property name="prespring_offset" value="0.09" />
+
+  <!-- Horizontal and vertical workspace limits. These are wider than the actual limits
+       used on the robot to provide maximum flexibility in the visualization -->
+  <xacro:property name="horiz_limit" value="${R_base + L_lower + L_upper}" />
+  <xacro:property name="vert_limit" value="${L_lower + L_upper}" />
+
+
+  <!-- offset of the base joints above the base platform -->
+  <!-- this offset is needed because the lower joints are above the base platform-->
+  <xacro:property name="base_offset" value="$(arg base_offset)" />
+
+  <!-- Compute inertial properties for a cylinder, where the reference frame is centered.
+       The axis of the cylinder
+  Parameters:
+  M - the mass,
+  R - the radius,
+  h - the height of the cylinder
+  axis - "z" to orient along z axis, x to orient along x axis
+-->
+  <xacro:macro name="cylinder_inertia" params="M R h axis">
+    <!--    <origin xyz="${0 if axis == 'z' else h/2.0} 0 ${h/2.0 if axis == 'z' else 0}" rpy="0 ${0 if axis == 'z' else -pi/2.0} 0" />-->
+    <inertial>
+      <mass value="${M}" />
+
+      <!-- shift the origin to the center of the link from the end. how this is done depends on if
+      the cylinder is x aligned or z aligned-->
+      <origin xyz="${0 if axis =='z' else h/2.0} 0 ${h/2.0 if axis=='z' else 0}" rpy="0 0 0" />
+
+      <!-- formulas for inertia matrix components along radial and axial axes -->
+      <xacro:property name="Iradial" value = "${M*h**2/12.0 + M*R**2/4.0}"/>
+      <xacro:property name="Iaxial" value = "${M*R**2/2.0}" />
+
+      <inertia ixx= "${Iradial if axis == 'z' else Iaxial}"
+               ixy="0"
+               ixz="0"
+               iyy= "${Iradial}"
+               iyz="0"
+               izz="${Iaxial if axis == 'z' else Iradial}" />
+    </inertial>
+  </xacro:macro>
+
+  <xacro:macro name="cylinder_collision" params="M R h axis">
+    <collision>
+      <origin xyz="${0 if axis == 'z' else h/2.0} 0 ${h/2.0 if axis == 'z' else 0}" rpy="0 ${0 if axis == 'z' else -pi/2.0} 0" />
+      <geometry>
+        <cylinder radius="${R}" length="${h}" />
+      </geometry>
+    </collision>
+  </xacro:macro>
+
+  <!-- Create a visual cylinder with the given name that is a cylinder with mass M,
+       radius R, height h, and the given material.
+       if axis == 'z' the cylinder is aligned with the z axis otherwise it is aligned
+            with the x axis. -->
+  <xacro:macro name="cylinder_visual" params="M R h axis mat">
+    <visual>
+      <!-- shift the visual so that the link frame is at one end of the cylinder, and
+           rotate it so that it matches the proper axis alignment -->
+      <origin xyz="${0 if axis == 'z' else h/2.0} 0 ${h/2.0 if axis == 'z' else 0}" rpy="0 ${0 if axis == 'z' else -pi/2.0} 0" />
+      <geometry>
+        <cylinder radius="${R}" length="${h}" />
+      </geometry>
+      <material name="${mat}" />
+    </visual>
+  </xacro:macro>
+
+  <!-- Create a cylindrical link with visual and inertial properties
+       name - the name of the link
+       M - the mass of the link
+       R - the radius
+       h - the height
+       axis - z to align with z axis, x to align with x axis
+       mat - the material -->
+  <xacro:macro name="cylinder_link" params="name M R h axis mat">
+    <link name="${name}">
+      <xacro:cylinder_visual M="${M}" R="${R}" h="${h}" axis="${axis}" mat="${mat}" />
+      <xacro:cylinder_inertia M="${M}" R="${R}" h="${h}" axis="${axis}" />
+      <xacro:cylinder_collision M="${M}" R="${R}" h="${h}" axis="{axis}"/>
+    </link>
+  </xacro:macro>
+
+  <!-- define colors -->
+  <material name="base_color" >
+    <color rgba="0.1 0.2 0.2 1.0"/>
+  </material>
+
+  <material name="platform_color" >
+    <color rgba="0.0 0.0 0.0 1.0"/>
+  </material>
+
+  <material name="lower_leg_color" >
+    <color rgba="0.0 0.0 0.6 1.0"/>
+  </material>
+
+  <material name="upper_leg_color" >
+    <color rgba="0.0 0.6 0.0 1.0"/>
+  </material>
+
+  <material name="prespring_color" >
+    <color rgba="0.6 0.6 0.6 1.0"/>
+  </material>
+
+  <material name="heart_pink" >
+    <color rgba="1.0 0.76 0.80 1.0"/>
+  </material>
+
+  <material name="dark_pink" >
+    <color rgba="1.0 0.43 0.51 1.0"/>
+  </material>
+
+  <material name="light_pink" >
+    <color rgba="0.94 0.50 0.50 1.0"/>
+  </material>
+
+  <!--  &lt;!&ndash; define the base of the delta robot&ndash;&gt;-->
+  <xacro:cylinder_link name="base_link"
+                       M="${M_base}"
+                       R="${R_base}"
+                       h="${h_base}"
+                       axis="z"
+                       mat="heart_pink" />
+
+
+  <xacro:cylinder_link name="world"
+                       M="1e-5"
+                       R="1e-5"
+                       h="1e-5"
+                       axis="x"
+                       mat="base_color" />
+
+  <!-- connect the base to the world -->
+  <joint name="fixed" type="fixed">
+    <parent link="world"/>
+    <origin xyz="0 0 ${-base_offset}" />
+    <child link="base_link"/>
+  </joint>
+
+
+<!--  tail_id - id of the leg that attaches to the end effector. Note only one leg can be attached to the end_effector-->
+  <xacro:macro name="end_effector" params="tail_id">
+    <!-- The x,y,z position of the platform is handled by a chain of 3 prismatic joints -->
+    <!-- handle the x motion of the platform -->
+    <link name="platform_x_link" >
+      <xacro:cylinder_inertia  M="1e-5" R="1e-10" h="1e-10" axis="0 0 1"/>
+    </link>
+
+    <joint name="x" type="prismatic" >
+      <parent link="floating_world_${tail_id}" />
+      <child link="platform_x_link" />
+      <axis xyz="1 0 0" />
+      <!-- Limits are required but currently arbitrary -->
+      <limit lower="${-horiz_limit}" upper="${horiz_limit}" effort="100" velocity="100"/>
+      <dynamics damping="0.0" friction="0.0"/>
+    </joint>
+
+    <!-- handle the y motion of the platform -->
+    <link name="platform_y_link" >
+      <xacro:cylinder_inertia  M="1e-5" R="1e-10" h="1e-10" axis="0 0 1"/>
+    </link>
+
+    <joint name="y" type="prismatic" >
+      <parent link="platform_x_link" />
+      <child link="platform_y_link" />
+      <axis xyz="0 1 0" />
+      <!-- Limits are required but currently arbitrary -->
+      <limit lower="${-horiz_limit}" upper="${horiz_limit}" effort="100" velocity="100"/>
+      <dynamics damping="0.0" friction="0.0"/>
+    </joint>
+
+    <!-- handle the z motion of the platform -->
+    <joint name="z" type="prismatic" >
+      <parent link="platform_y_link" />
+      <child link="platform_link" />
+      <axis xyz="0 0 1" />
+      <!-- Limits are required but currently arbitrary -->
+      <limit lower="${-base_offset}" upper="${vert_limit}" effort="100" velocity="100"/>
+      <dynamics damping="0.0" friction="0.0"/>
+    </joint>
+
+    <!-- define the end-effector platform -->
+    <xacro:cylinder_link name="platform_link"
+                         M="${M_platform}"
+                         R="${R_platform}"
+                         h="${h_platform}"
+                         axis="z"
+                         mat="heart_pink" />
+  </xacro:macro>
+
+
+  <!-- a macro to define the legs.
+       id - the id number of the leg
+       offset - angle in radians of the line from the center to the lower leg attachment point
+       head - if the leg attaches to the base_link, then set it to 1. Else, set to  false.
+  -->
+  <xacro:macro name="leg" params="id offset head">
+      <!-- This link and fixed joint is used as a placeholder for where the lower leg attaches to the base -->
+      <link name="lower_leg_attach_link_${id}">
+        <xacro:cylinder_inertia  M="1e-5" R="1e-10" h="1e-10" axis="0 0 1"/>
+      </link>
+
+      <joint name="lower_leg_attach_joint_${id}" type="fixed">
+        <xacro:if value="${head}">
+          <parent link="world" />
+        </xacro:if>
+        <xacro:unless value="${head}">
+          <parent link="floating_world_${id-1}" />
+        </xacro:unless>
+        <child link="lower_leg_attach_link_${id}" />
+        <origin xyz="${R_base*cos(offset)} ${R_base*sin(offset)} 0" rpy="0 0 ${offset}" />
+        <dynamics damping="0.0" friction="0.0"/>
+      </joint>
+
+      <!-- define the lower leg link -->
+      <xacro:cylinder_link name="lower_leg_${id}"
+                           M="${M_lower}"
+                           R="${R_lower}"
+                           h="${L_lower}"
+                           axis="x"
+                           mat="light_pink"
+      />
+      <!-- connect the lower leg to the base, this is the after the spring angle joint -->
+      <joint name="theta_${id}" type="revolute">
+        <parent link="lower_leg_attach_link_${id}" />
+        <child link="lower_leg_${id}" />
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <axis xyz = "0 -1 0" rpy="0 0 0"/>
+        <limit lower="${-pi/4.0}" upper="${pi/2.0}" effort="100" velocity="100" />
+        <dynamics damping="0.0" friction="0.0"/>
+      </joint>
+
+
+        <!--      the chain for serialization -->
+    <joint name="mimic_theta_${id}" type="revolute">
+      <parent link="lower_leg_${id}" />
+      <child link="mimic_theta_link_${id}" />
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <axis xyz = "0 -1 0" rpy="0 0 0"/>
+      <limit lower="${-pi/2.0}" upper="${pi/2.0}" effort="100" velocity="100" />
+      <dynamics damping="0.0" friction="0.0"/>
+      <mimic joint="theta_${id}" multiplier="-1" offset="0"/>
+    </joint>
+    <link name="mimic_theta_link_${id}"/>
+    <joint name="mimic_theta_link_floating_world_${id}" type="fixed">
+      <parent link="mimic_theta_link_${id}" />
+      <child link="floating_world_${id}" />
+      <origin xyz="${-R_base} 0 0" rpy="0 0 ${-offset}" />
+      <dynamics damping="0.0" friction="0.0"/>
+    </joint>
+    <link name="floating_world_${id}"/>
+    <!--The chain for serialization ends here-->
+
+    <!-- define the pre-spring link -->
+    <xacro:cylinder_link name="lower_leg_prespring_${id}"
+                         M="${M_prespring}"
+                         R="${R_prespring}"
+                         h="${h_prespring}"
+                         axis="x"
+                         mat="prespring_color" />
+
+    <joint name="phi_${id}" type="continuous">
+      <parent link="lower_leg_attach_link_${id}" />
+      <child link="lower_leg_prespring_${id}" />
+      <origin xyz="0 -${prespring_offset} 0" rpy="0 0 ${pi/2.0}" />
+      <axis xyz = "-1 0 0" rpy="0 0 0" />
+      <dynamics damping="0.0" friction="0.0"/>
+    </joint>
+
+      <!-- define a frame at the knee between the lower and upper legs -->
+      <link name="knee_${id}" >
+        <xacro:cylinder_inertia  M="1e-5" R="1e-10" h="1e-10" axis="0 0 1"/>
+      </link>
+
+      <!-- define the universal joint between he upper and lower links. This is the knee pitch angle joint -->
+      <joint name="beta_${id}" type="continuous">
+        <parent link="lower_leg_${id}" />
+        <child link="knee_${id}" />
+        <origin xyz="${L_lower} 0 0" rpy="0 0 0" />
+        <axis xyz="0 -1 0" rpy="0 0 0" />
+        <dynamics damping="0.0" friction="0.0"/>
+      </joint>
+
+      <!-- define the upper arm link -->
+      <xacro:cylinder_link name="upper_leg_${id}"
+                           M="${M_upper}"
+                           R="${R_upper}"
+                           h="${L_upper}"
+                           axis="x"
+                           mat="dark_pink"
+      />
+
+      <!-- this is the knee yaw angle joint -->
+      <joint name="gamma_${id}" type="continuous">
+        <parent link="knee_${id}" />
+        <child link="upper_leg_${id}" />
+        <axis xyz="0 0 -1" rpy="0 0 0" />
+        <dynamics damping="0.0" friction="0.0"/>
+      </joint>
+  </xacro:macro>
+
+  <xacro:leg id="1" offset="0" head="True"/>
+  <xacro:leg id="2" offset="${2*pi/3.0}" head="False"/>
+  <xacro:leg id="3" offset="${4*pi/3.0}" head="False"/>
+  <xacro:end_effector tail_id="3"/>
+
+</robot>

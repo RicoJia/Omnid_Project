@@ -1,0 +1,117 @@
+#!/usr/bin/env python3
+
+'''
+Simulate the torsional spring model and generate a plot for the associated states.
+The states are:
+  1. Coordinates of the spring joint(x,y)
+  2.angle between the spring and the parent link theta_p
+  3. angle between the spring and the child link, theta_c
+'''
+
+import rospy
+import numpy as np
+import sys
+import pybullet as p
+import rospkg
+
+import numpy as np
+import pybullet_data
+from torsion_spring import Spring_Model
+import matplotlib as plt
+import matplotlib.pyplot as plt
+
+def plot_xy(tspan, dt, x,y, footnote):
+  """A helper function to plot our data sets
+
+  PARAMETERS
+  ----------
+  x      A 1d numpy array of x
+  y      A 1d numpy array of y
+  footnote  A python string for footnote
+  """
+  # plot the data
+  tvec = np.arange(start = min(tspan), stop = max(tspan),step=dt)
+  plt.plot(tvec, x, label='x')
+  plt.plot(tvec, y, label='y')
+  plt.figtext(0.5, 0.01, footnote, ha="center") #foot note
+  plt.axis('equal')
+  plt.legend()
+  plt.show()
+
+# ```
+#  - Make plots side by side
+#  ```
+#   fig=plt.figure(figsize=(20,5), dpi= 100, facecolor='w', edgecolor='k')
+#   plt.subplot(1,2,2)
+
+def plot_angles(tspan, dt, theta_c, theta_p, footnote):
+  """A helper function to plot our data sets
+
+  PARAMETERS
+  ----------
+  x      A 1d numpy array of x
+  y      A 1d numpy array of y
+  footnote  A python string for footnote
+  """
+  # plot the data
+  tvec = np.arange(start = min(tspan), stop = max(tspan),step=dt)
+  if theta_c is not None:
+    plt.plot(tvec, theta_c, label='child link angle')
+  if theta_p is not None:
+    plt.plot(tvec, theta_p, label='parentlink angle')
+  plt.text(0.5, 0.01, footnote, ha="center") #foot note
+  plt.axis('equal')
+  plt.legend()
+  plt.show()
+
+def main(unused_args):
+  rospy.init_node("spring_test")
+  c = p.connect(p.SHARED_MEMORY)
+  if (c < 0):
+    c = p.connect(p.GUI)
+  p.setAdditionalSearchPath(pybullet_data.getDataPath())
+
+  p.resetSimulation()
+  p.loadURDF("/plane.urdf" )  #loads from the root pybullet library
+  p.setGravity(0, 0, 0.0)
+
+  urdf_path = ((rospkg.RosPack()).get_path('omnid'))+'/urdf'
+  print("urdf_path: ",urdf_path)
+  p.setRealTimeSimulation(0)
+
+  # global joint_values
+  timeStep = 0.001
+  p.setTimeStep(timeStep)
+  r = rospy.Rate(1.0/timeStep)
+  global spring_model
+  initial_angle = 1.57  #radians
+  torque_k=1
+  joint_name="spring_joint"
+  spring_model= Spring_Model(urdf_path, initial_angle, joint_name, torque_k)
+  sim_time = 10.0  #second(s)
+  #we need: base link x,y, orientation, joint angle
+  child_joint_angle = np.zeros(int(sim_time/timeStep))
+  link_world_x = np.zeros(int(sim_time/timeStep))
+  link_world_y = np.zeros(int(sim_time/timeStep))
+  index = 0
+
+  spring_turn = True
+  while index < int(sim_time/timeStep) and p.isConnected() and not rospy.is_shutdown():
+    spring_model.apply_torque_spring()
+    spring_model.non_zero_velocity_control()
+
+    link_states = spring_model.get_link_state(link_index=0)
+    child_joint_angle[index] = spring_model.get_joint_state(joint_name="spring_joint")["jointPosition"]
+    link_world_x[index] = link_states["link_world_position"][0]
+    link_world_y[index] = link_states["link_world_position"][1]
+    p.stepSimulation()
+    index+=1
+    r.sleep()
+
+  # plot_xy(tspan=[0,sim_time], dt=timeStep, x=link_world_x, y=link_world_y, footnote="position plot")
+  plot_angles(tspan=[0, sim_time], dt=timeStep, theta_c=child_joint_angle, theta_p=None, footnote="joint angles")
+if __name__ == "__main__":
+    try:
+        main(0);
+    except rospy.ROSInterruptException:
+        pass

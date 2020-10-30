@@ -1,0 +1,4 @@
+end_effector_arm:
+  kinematics_solver: omnid_kinematics/OmnidKinematicsPlugin
+  kinematics_solver_search_resolution: 0.005
+  kinematics_solver_timeout: 0.005

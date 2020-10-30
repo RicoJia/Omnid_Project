@@ -1,0 +1,32 @@
+<launch>
+    <arg name="test_spring" default="false"/>
+    <node pkg="omnid" type="omnid_simulator" name="omnid_simulator" output="screen" unless="$(arg test_spring)" required="true">
+        <rosparam command="load" file="$(find omnid)/params/params.yaml" />
+    </node>
+    <node pkg="omnid" type="spring_test_simulator" name="spring_test_simulator" output="screen" if="$(arg test_spring)" required="true"/>
+
+    <include file="$(find omnid)/launch/moveit_omnid.launch"/>
+
+<!--    <arg name="cmd" default="$(find xacro)/xacro &#45;&#45;inorder -o $(find omnid)/urdf/delta_robot.urdf $(find omnid)/urdf/delta_robot.urdf.xacro-->
+<!--       R_base:=0.18-->
+<!--       h_base:=0.009525-->
+<!--       M_base:=2.5-->
+<!--       R_platform:=0.062-->
+<!--       h_platform:=0.01-->
+<!--       M_platform:=0.5-->
+<!--       L_lower:=0.200-->
+<!--       L_upper:=0.368-->
+<!--       base_offset:=0.046375-->
+<!--       "/>-->
+<!--    <param name="robot_description" command="$(arg cmd)"/>-->
+</launch>
+
+        <!--    <arg name="cmd" default="$(find xacro)/xacro &#45;&#45;inorder $(find omnid)/urdf/spring/spring.urdf.xacro"/>-->
+        <!--    <param name="robot_description" command="$(arg cmd)"/>-->
+
+        <!--    <node pkg="rviz" type="rviz" name="rviz" required="true"-->
+        <!--          args="-d $(find omnid)/rviz/delta_arm.urdf.rviz"/>-->
+        <!--    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>-->
+
+        <!--    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" >-->
+        <!--    </node>-->

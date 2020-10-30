@@ -1,0 +1,5 @@
+<library path="lib/libomnid_kinematics_plugin">
+    <class name="omnid_kinematics/OmnidKinematicsPlugin" type="omnid_kinematics::OmnidKinematicsPlugin" base_class_type="kinematics::KinematicsBase">
+        <description>Kinematics Plugin for the Omnid Delta Arm Project </description>
+    </class>
+</library>

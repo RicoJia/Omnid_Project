@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--This does not replace URDF, and is not an extension of URDF.
+    This is a format for representing semantic information about the robot structure.
+    A URDF file must exist for this robot as well, where the joints and the links that are referenced are defined
+-->
+<robot name="delta-robot-RUU">
+    <!--GROUPS: Representation of a set of joints and links. This can be useful for specifying DOF to plan for, defining arms, end effectors, etc-->
+    <!--LINKS: When a link is specified, the parent joint of that link (if it exists) is automatically included-->
+    <!--JOINTS: When a joint is specified, the child link of that joint (which will always exist) is automatically included-->
+    <!--CHAINS: When a chain is specified, all the links along the chain (including endpoints) are included in the group. Additionally, all the joints that are parents to included links are also included. This means that joints along the chain and the parent joint of the base link are included in the group-->
+    <!--SUBGROUPS: Groups can also be formed by referencing to already defined group names-->
+    <group name="end_effector">
+        <link name="platform_link"/>
+    </group>
+    <group name="end_effector_arm">
+        <joint name="x"/>
+        <joint name="y"/>
+        <joint name="z"/>
+        <joint name="mimic_theta_link_floating_world_3"/>
+        <joint name="mimic_theta_3"/>
+        <joint name="theta_3"/>
+        <joint name="lower_leg_attach_joint_3"/>
+        <joint name="mimic_theta_link_floating_world_2"/>
+        <joint name="mimic_theta_2"/>
+        <joint name="theta_2"/>
+        <joint name="lower_leg_attach_joint_2"/>
+        <joint name="mimic_theta_link_floating_world_1"/>
+        <joint name="mimic_theta_1"/>
+        <joint name="theta_1"/>
+        <joint name="lower_leg_attach_joint_1"/>
+    </group>
+    <!--GROUP STATES: Purpose: Define a named state for a particular group, in terms of joint values. This is useful to define states like 'folded arms'-->
+    <group_state name="home" group="end_effector">
+        <joint name="z" value="0.0012"/>
+    </group_state>
+    <!--END EFFECTOR: Purpose: Represent information about an end effector.-->
+    <end_effector name="end_effector" parent_link="platform_y_link" group="end_effector" parent_group="end_effector_arm"/>
+    <!--VIRTUAL JOINT: Purpose: this element defines a virtual joint between a robot link and an external frame of reference (considered fixed with respect to the robot)-->
+    <virtual_joint name="FixedBase" type="fixed" parent_frame="world" child_link="world"/>
+    <!--PASSIVE JOINT: Purpose: this element is used to mark joints that are not actuated-->
+    <passive_joint name="phi_1"/>
+    <passive_joint name="beta_1"/>
+    <passive_joint name="gamma_1"/>
+    <passive_joint name="mimic_theta_1"/>
+    <passive_joint name="phi_2"/>
+    <passive_joint name="beta_2"/>
+    <passive_joint name="gamma_2"/>
+    <passive_joint name="mimic_theta_2"/>
+    <passive_joint name="phi_3"/>
+    <passive_joint name="beta_3"/>
+    <passive_joint name="gamma_3"/>
+    <passive_joint name="mimic_theta_3"/>
+    <!--DISABLE COLLISIONS: By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. This tag disables collision checking between a specified pair of links. -->
+    <disable_collisions link1="base_link" link2="lower_leg_1" reason="Never"/>
+    <disable_collisions link1="base_link" link2="lower_leg_2" reason="Never"/>
+    <disable_collisions link1="base_link" link2="lower_leg_3" reason="Never"/>
+    <disable_collisions link1="base_link" link2="lower_leg_prespring_1" reason="Never"/>
+    <disable_collisions link1="base_link" link2="lower_leg_prespring_2" reason="Never"/>
+    <disable_collisions link1="base_link" link2="lower_leg_prespring_3" reason="Never"/>
+    <disable_collisions link1="base_link" link2="platform_link" reason="Default"/>
+    <disable_collisions link1="base_link" link2="world" reason="Adjacent"/>
+    <disable_collisions link1="lower_leg_1" link2="lower_leg_2" reason="Adjacent"/>
+    <disable_collisions link1="lower_leg_1" link2="lower_leg_3" reason="Never"/>
+    <disable_collisions link1="lower_leg_1" link2="lower_leg_prespring_1" reason="Adjacent"/>
+    <disable_collisions link1="lower_leg_1" link2="lower_leg_prespring_2" reason="Adjacent"/>
+    <disable_collisions link1="lower_leg_1" link2="lower_leg_prespring_3" reason="Never"/>
+    <disable_collisions link1="lower_leg_1" link2="upper_leg_1" reason="Adjacent"/>
+    <disable_collisions link1="lower_leg_1" link2="world" reason="Adjacent"/>
+    <disable_collisions link1="lower_leg_2" link2="lower_leg_3" reason="Adjacent"/>
+    <disable_collisions link1="lower_leg_2" link2="lower_leg_prespring_1" reason="Never"/>
+    <disable_collisions link1="lower_leg_2" link2="lower_leg_prespring_2" reason="Adjacent"/>
+    <disable_collisions link1="lower_leg_2" link2="lower_leg_prespring_3" reason="Adjacent"/>
+    <disable_collisions link1="lower_leg_2" link2="upper_leg_1" reason="Never"/>
+    <disable_collisions link1="lower_leg_2" link2="upper_leg_2" reason="Adjacent"/>
+    <disable_collisions link1="lower_leg_2" link2="world" reason="Never"/>
+    <disable_collisions link1="lower_leg_3" link2="lower_leg_prespring_1" reason="Never"/>
+    <disable_collisions link1="lower_leg_3" link2="lower_leg_prespring_2" reason="Never"/>
+    <disable_collisions link1="lower_leg_3" link2="lower_leg_prespring_3" reason="Adjacent"/>
+    <disable_collisions link1="lower_leg_3" link2="upper_leg_1" reason="Never"/>
+    <disable_collisions link1="lower_leg_3" link2="upper_leg_3" reason="Adjacent"/>
+    <disable_collisions link1="lower_leg_3" link2="world" reason="Never"/>
+    <disable_collisions link1="lower_leg_prespring_1" link2="lower_leg_prespring_2" reason="Never"/>
+    <disable_collisions link1="lower_leg_prespring_1" link2="lower_leg_prespring_3" reason="Never"/>
+    <disable_collisions link1="lower_leg_prespring_1" link2="upper_leg_2" reason="Never"/>
+    <disable_collisions link1="lower_leg_prespring_1" link2="world" reason="Adjacent"/>
+    <disable_collisions link1="lower_leg_prespring_2" link2="lower_leg_prespring_3" reason="Never"/>
+    <disable_collisions link1="lower_leg_prespring_2" link2="platform_link" reason="Never"/>
+    <disable_collisions link1="lower_leg_prespring_2" link2="upper_leg_3" reason="Never"/>
+    <disable_collisions link1="lower_leg_prespring_2" link2="world" reason="Never"/>
+    <disable_collisions link1="lower_leg_prespring_3" link2="upper_leg_1" reason="Never"/>
+    <disable_collisions link1="lower_leg_prespring_3" link2="world" reason="Never"/>
+    <disable_collisions link1="platform_link" link2="world" reason="Adjacent"/>
+    <disable_collisions link1="upper_leg_1" link2="world" reason="Never"/>
+    <disable_collisions link1="upper_leg_3" link2="world" reason="Never"/>
+</robot>
