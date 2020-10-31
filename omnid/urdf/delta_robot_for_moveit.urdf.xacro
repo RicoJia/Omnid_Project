@@ -292,8 +292,7 @@ line program has not been written
         <dynamics damping="0.0" friction="0.0"/>
       </joint>
 
-
-        <!--      the chain for serialization -->
+      <!--      the chain for serialization -->
     <joint name="mimic_theta_${id}" type="revolute">
       <parent link="lower_leg_${id}" />
       <child link="mimic_theta_link_${id}" />

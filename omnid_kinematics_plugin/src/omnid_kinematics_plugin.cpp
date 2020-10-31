@@ -3,6 +3,8 @@
 #include <urdf_model/model.h>
 #include <srdfdom/model.h>
 #include <moveit/rdf_loader/rdf_loader.h>
+#include "omnid_core/delta_robot.h"
+
 
 //TODO
 //#include <omnid_kinematics_plugin/omnid_kinematics_plugin.h>
@@ -44,7 +46,7 @@ namespace omnid_kinematics{
         dimension_ = joint_model_group->getActiveJointModels().size() + joint_model_group->getMimicJointModels().size();
         for (std::size_t i=0; i < joint_model_group->getJointModels().size(); ++i)
         {
-            robot_model::JointModel* jm = joint_model_group->getJointModels()[i];
+            const robot_model::JointModel* jm = joint_model_group->getJointModels()[i];
             if(jm->getType() == moveit::core::JointModel::REVOLUTE || jm->getType() == moveit::core::JointModel::PRISMATIC)
             {
                 ik_chain_info_.joint_names.push_back(joint_model_group->getJointModelNames()[i]);
@@ -89,7 +91,7 @@ namespace omnid_kinematics{
         }
 
         //TODO joint_model_group -> getMimicJointModels(), return a vector of JointModels
-        //TODO: oint_model_group -> getJointModelNames, for names
+        //TODO joint_model_group -> getJointModelNames, for names
 
 
         // Check for mimic joints
@@ -190,7 +192,6 @@ namespace omnid_kinematics{
                                 options);
     }
 
-/////////
 
     bool OmnidKinematicsPlugin::searchPositionIK(const geometry_msgs::Pose &ik_pose,
                                               const std::vector<double> &ik_seed_state,
@@ -258,14 +259,29 @@ namespace omnid_kinematics{
             return false;
         }
 
-        solution.resize(dimension_);
+        //Solving IK here
+        const struct type_linear_position pos = {.x = ik_pose.position.x, .y = ik_pose.position.y, .z = ik_pose.position.z};
+        struct type_angular_position out;
+////        delta_robot_inverse_kinematics(&delta_robot, &pos, &out);
+        delta_robot_inverse_kinematics(&DELTA_ROBOT, &pos, &out);
+        std::vector<double> out_vec{out.theta1, out.theta2, out.theta3};
+        std::vector<double> pose_vec{ik_pose.position.x, ik_pose.position.y, ik_pose.position.z};
+        solution = std::vector<double>(dimension_, 0);
 
-        // TODO
-        double cheat_angle = 1.57;
-        // We don't even need a timeout for this!
-        for (auto& s: solution){
-            s = cheat_angle;
+        // here solution element is in the same order as theta1, 2, 3
+        for (unsigned int i = 0; i < actuated_joint_names_.size(); ++i) {
+            const std::string joint_name = actuated_joint_names_.at(i);
+            solution.at(getJointIndex(joint_name)) = out_vec.at(i);
         }
+        for (unsigned int i = 0; i < end_effector_joint_names_.size(); ++i) {
+            const std::string joint_name = end_effector_joint_names_.at(i);
+            solution.at(getJointIndex(joint_name)) = pose_vec.at(i);
+        }
+
+//        for(const auto& joint:mimic_joint_arr_){
+//            solution.at(getJointIndex(joint->getName())) = cheat_mimic_angle;
+//        }
+
         error_code.val = error_code.SUCCESS;
         ROS_INFO_NAMED("omnid_kinematics_plugin","HEHEHE IK");
         for (auto& i : ik_chain_info_.joint_names){

@@ -16,6 +16,9 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
 )
 
+find_package(omnid_core)
+find_package(cmakeme)
+cmakeme_defaults(Debug)
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -149,9 +152,13 @@ include_directories(
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(${PROJECT_NAME}_node
-#   ${catkin_LIBRARIES}
-# )
+ target_link_libraries(${PROJECT_NAME}
+         PUBLIC
+   ${catkin_LIBRARIES}
+         omnid_core::omnid_core
+ )
+
+# cmakeme_install(${PROJECT_NAME} NAMESPACE ${PROJECT_NAME}  DEPENDS omnid_core)
 
 #############
 ## Install ##

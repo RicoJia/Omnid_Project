@@ -26,6 +26,8 @@
   <exec_depend>moveit_ros_planning</exec_depend>
   <exec_depend>pluginlib</exec_depend>
   <exec_depend>roscpp</exec_depend>
+  <depend>omnid_core_all</depend>
+  <build_depend>cmakeme</build_depend>
 
 
   <export>
