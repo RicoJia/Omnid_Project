@@ -5,8 +5,10 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /MotionPlanning1
+        - /TF1
+        - /TF1/Frames1
       Splitter Ratio: 0.7425600290298462
-    Tree Height: 409
+    Tree Height: 359
   - Class: rviz/Help
     Name: Help
   - Class: rviz/Views
@@ -45,7 +47,7 @@ Visualization Manager:
       Move Group Namespace: ""
       MoveIt_Allow_Approximate_IK: false
       MoveIt_Allow_External_Program: false
-      MoveIt_Allow_Replanning: false
+      MoveIt_Allow_Replanning: true
       MoveIt_Allow_Sensor_Positioning: false
       MoveIt_Goal_Tolerance: 0
       MoveIt_Planning_Attempts: 10
@@ -78,6 +80,18 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          extra_knee_link_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          extra_knee_link_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          extra_knee_link_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           floating_world_1:
             Alpha: 1
             Show Axes: false
@@ -144,6 +158,30 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          mimic_knee_link_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mimic_knee_link_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mimic_knee_link_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mimic_lower_leg_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mimic_lower_leg_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mimic_lower_leg_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           mimic_theta_link_1:
             Alpha: 1
             Show Axes: false
@@ -239,6 +277,18 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          extra_knee_link_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          extra_knee_link_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          extra_knee_link_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           floating_world_1:
             Alpha: 1
             Show Axes: false
@@ -305,6 +355,30 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          mimic_knee_link_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mimic_knee_link_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mimic_knee_link_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mimic_lower_leg_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mimic_lower_leg_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mimic_lower_leg_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           mimic_theta_link_1:
             Alpha: 1
             Show Axes: false
@@ -355,6 +429,130 @@ Visualization Manager:
         Show Robot Visual: true
       Value: true
       Velocity_Scaling_Factor: 0.1
+    - Class: rviz/TF
+      Enabled: true
+      Frame Timeout: 15
+      Frames:
+        All Enabled: false
+        base_link:
+          Value: false
+        extra_knee_link_1:
+          Value: true
+        extra_knee_link_2:
+          Value: true
+        extra_knee_link_3:
+          Value: true
+        floating_world_1:
+          Value: false
+        floating_world_2:
+          Value: false
+        floating_world_3:
+          Value: false
+        knee_1:
+          Value: false
+        knee_2:
+          Value: false
+        knee_3:
+          Value: false
+        lower_leg_1:
+          Value: false
+        lower_leg_2:
+          Value: false
+        lower_leg_3:
+          Value: false
+        lower_leg_attach_link_1:
+          Value: false
+        lower_leg_attach_link_2:
+          Value: false
+        lower_leg_attach_link_3:
+          Value: false
+        lower_leg_prespring_1:
+          Value: false
+        lower_leg_prespring_2:
+          Value: false
+        lower_leg_prespring_3:
+          Value: false
+        mimic_knee_link_1:
+          Value: false
+        mimic_knee_link_2:
+          Value: false
+        mimic_knee_link_3:
+          Value: false
+        mimic_lower_leg_1:
+          Value: false
+        mimic_lower_leg_2:
+          Value: false
+        mimic_lower_leg_3:
+          Value: false
+        mimic_theta_link_1:
+          Value: false
+        mimic_theta_link_2:
+          Value: false
+        mimic_theta_link_3:
+          Value: false
+        platform_link:
+          Value: false
+        platform_x_link:
+          Value: false
+        platform_y_link:
+          Value: false
+        upper_leg_1:
+          Value: false
+        upper_leg_2:
+          Value: false
+        upper_leg_3:
+          Value: false
+        world:
+          Value: false
+      Marker Alpha: 1
+      Marker Scale: 1
+      Name: TF
+      Show Arrows: false
+      Show Axes: false
+      Show Names: false
+      Tree:
+        world:
+          base_link:
+            {}
+          lower_leg_attach_link_1:
+            lower_leg_1:
+              knee_1:
+                upper_leg_1:
+                  mimic_knee_link_1:
+                    extra_knee_link_1:
+                      mimic_lower_leg_1:
+                        mimic_theta_link_1:
+                          floating_world_1:
+                            lower_leg_attach_link_2:
+                              lower_leg_2:
+                                knee_2:
+                                  upper_leg_2:
+                                    mimic_knee_link_2:
+                                      extra_knee_link_2:
+                                        mimic_lower_leg_2:
+                                          mimic_theta_link_2:
+                                            floating_world_2:
+                                              lower_leg_attach_link_3:
+                                                lower_leg_3:
+                                                  knee_3:
+                                                    upper_leg_3:
+                                                      mimic_knee_link_3:
+                                                        extra_knee_link_3:
+                                                          mimic_lower_leg_3:
+                                                            mimic_theta_link_3:
+                                                              floating_world_3:
+                                                                platform_x_link:
+                                                                  platform_y_link:
+                                                                    platform_link:
+                                                                      {}
+                                                lower_leg_prespring_3:
+                                                  {}
+                              lower_leg_prespring_2:
+                                {}
+            lower_leg_prespring_1:
+              {}
+      Update Interval: 0
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -371,7 +569,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/XYOrbit
-      Distance: 2.996500015258789
+      Distance: 1.5282162427902222
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -379,17 +577,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 0.11356700211763382
-        Y: 0.10592000186443329
-        Z: 2.2351800055275817e-07
+        X: -0.1504443883895874
+        Y: -0.008039973676204681
+        Z: 4.0233192066807533e-07
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.5097969770431519
+      Pitch: 0.2347971349954605
       Target Frame: world
-      Yaw: 5.659949779510498
+      Yaw: 0.551796019077301
     Saved: ~
 Window Geometry:
   Displays:
@@ -403,9 +601,9 @@ Window Geometry:
     collapsed: false
   MotionPlanning - Trajectory Slider:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd0000000100000000000002a2000003abfc0200000007fb000000100044006900730070006c006100790073010000003b00000228000000c700fffffffb0000000800480065006c00700000000342000000bb0000006e00fffffffb0000000a0056006900650077007300000003b0000000b0000000a000fffffffb0000000c00430061006d00650072006100000002ff000001610000000000000000fb0000001e004d006f00740069006f006e00200050006c0061006e006e0069006e00670100000374000001890000000000000000fb00000044004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000003f00fffffffb0000001c004d006f00740069006f006e0050006c0061006e006e0069006e006701000002690000017d0000017200ffffff00000495000003ab00000001000000020000000100000002fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd000000010000000000000257000003abfc0200000007fb000000100044006900730070006c006100790073000000003b00000205000000c700fffffffb0000000800480065006c00700000000342000000bb0000006e00fffffffb0000000a0056006900650077007300000003b0000000b0000000a000fffffffb0000000c00430061006d00650072006100000002ff000001610000000000000000fb0000001e004d006f00740069006f006e00200050006c0061006e006e0069006e00670100000374000001890000000000000000fb00000044004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d0020005400720061006a006500630074006f0072007900200053006c0069006400650072010000003b0000003f0000003f00fffffffb0000001c004d006f00740069006f006e0050006c0061006e006e0069006e00670100000080000003660000020400ffffff000004e0000003ab00000001000000020000000100000002fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Views:
     collapsed: false
   Width: 1853
-  X: 67
+  X: 1987
   Y: 27

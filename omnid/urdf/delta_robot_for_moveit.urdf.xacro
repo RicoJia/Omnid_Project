@@ -274,43 +274,6 @@ line program has not been written
         <dynamics damping="0.0" friction="0.0"/>
       </joint>
 
-      <!-- define the lower leg link -->
-      <xacro:cylinder_link name="lower_leg_${id}"
-                           M="${M_lower}"
-                           R="${R_lower}"
-                           h="${L_lower}"
-                           axis="x"
-                           mat="light_pink"
-      />
-      <!-- connect the lower leg to the base, this is the after the spring angle joint -->
-      <joint name="theta_${id}" type="revolute">
-        <parent link="lower_leg_attach_link_${id}" />
-        <child link="lower_leg_${id}" />
-        <origin xyz="0 0 0" rpy="0 0 0" />
-        <axis xyz = "0 -1 0" rpy="0 0 0"/>
-        <limit lower="${-pi/4.0}" upper="${pi/2.0}" effort="100" velocity="100" />
-        <dynamics damping="0.0" friction="0.0"/>
-      </joint>
-
-      <!--      the chain for serialization -->
-    <joint name="mimic_theta_${id}" type="revolute">
-      <parent link="lower_leg_${id}" />
-      <child link="mimic_theta_link_${id}" />
-      <origin xyz="0 0 0" rpy="0 0 0" />
-      <axis xyz = "0 -1 0" rpy="0 0 0"/>
-      <limit lower="${-pi/2.0}" upper="${pi/2.0}" effort="100" velocity="100" />
-      <dynamics damping="0.0" friction="0.0"/>
-      <mimic joint="theta_${id}" multiplier="-1" offset="0"/>
-    </joint>
-    <link name="mimic_theta_link_${id}"/>
-    <joint name="mimic_theta_link_floating_world_${id}" type="fixed">
-      <parent link="mimic_theta_link_${id}" />
-      <child link="floating_world_${id}" />
-      <origin xyz="${-R_base} 0 0" rpy="0 0 ${-offset}" />
-      <dynamics damping="0.0" friction="0.0"/>
-    </joint>
-    <link name="floating_world_${id}"/>
-    <!--The chain for serialization ends here-->
 
     <!-- define the pre-spring link -->
     <xacro:cylinder_link name="lower_leg_prespring_${id}"
@@ -327,6 +290,24 @@ line program has not been written
       <axis xyz = "-1 0 0" rpy="0 0 0" />
       <dynamics damping="0.0" friction="0.0"/>
     </joint>
+
+    <!-- define the lower leg link -->
+      <xacro:cylinder_link name="lower_leg_${id}"
+                           M="${M_lower}"
+                           R="${R_lower}"
+                           h="${L_lower}"
+                           axis="x"
+                           mat="light_pink"
+      />
+      <!-- connect the lower leg to the base, this is the after the spring angle joint -->
+      <joint name="theta_${id}" type="revolute">
+        <parent link="lower_leg_attach_link_${id}" />
+        <child link="lower_leg_${id}" />
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <axis xyz = "0 -1 0" rpy="0 0 0"/>
+        <limit lower="${-pi/4.0}" upper="${pi/2.0}" effort="100" velocity="100" />
+        <dynamics damping="0.0" friction="0.0"/>
+      </joint>
 
       <!-- define a frame at the knee between the lower and upper legs -->
       <link name="knee_${id}" >
@@ -358,6 +339,52 @@ line program has not been written
         <axis xyz="0 0 -1" rpy="0 0 0" />
         <dynamics damping="0.0" friction="0.0"/>
       </joint>
+
+    <!--      the chain for serialization -->
+    <joint name="mimic_gamma_${id}" type="continuous">
+      <parent link="upper_leg_${id}" />
+      <child link="mimic_knee_link_${id}" />
+      <axis xyz="0 0 -1" rpy="0 0 0" />
+      <dynamics damping="0.0" friction="0.0"/>
+      <mimic joint="gamma_${id}" multiplier="-1" offset="0"/>
+    </joint>
+    <link name="mimic_knee_link_${id}"/>
+
+    <joint name="mimic_beta_${id}" type="continuous">
+      <parent link="mimic_knee_link_${id}" />
+      <child link="extra_knee_link_${id}" />
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <axis xyz="0 -1 0" rpy="0 0 0" />
+      <dynamics damping="0.0" friction="0.0"/>
+      <mimic joint="beta_${id}" multiplier="-1" offset="0"/>
+    </joint>
+    <link name="extra_knee_link_${id}"/>
+
+    <joint name="extra_knee_lower_leg_${id}" type="fixed">
+      <parent link="extra_knee_link_${id}" />
+      <child link="mimic_lower_leg_${id}" />
+      <origin xyz="${-L_lower} 0 0" rpy="0 0 0" />
+    </joint>
+    <link name="mimic_lower_leg_${id}"/>
+    <joint name="mimic_theta_${id}" type="revolute">
+      <parent link="mimic_lower_leg_${id}" />
+      <child link="mimic_theta_link_${id}" />
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <axis xyz = "0 -1 0" rpy="0 0 0"/>
+      <limit lower="${-pi/2.0}" upper="${pi/2.0}" effort="100" velocity="100" />
+      <dynamics damping="0.0" friction="0.0"/>
+      <mimic joint="theta_${id}" multiplier="-1" offset="0"/>
+    </joint>
+    <link name="mimic_theta_link_${id}"/>
+    <joint name="mimic_theta_link_floating_world_${id}" type="fixed">
+      <parent link="mimic_theta_link_${id}" />
+      <child link="floating_world_${id}" />
+      <origin xyz="${-R_base} 0 0" rpy="0 0 ${-offset}" />
+      <dynamics damping="0.0" friction="0.0"/>
+    </joint>
+    <link name="floating_world_${id}"/>
+    <!--The chain for serialization ends here-->
+
   </xacro:macro>
 
   <xacro:leg id="1" offset="0" head="True"/>

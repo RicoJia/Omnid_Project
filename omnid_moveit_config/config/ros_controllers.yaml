@@ -9,15 +9,12 @@ generic_hw_control_loop:
 # Settings for ros_control hardware interface
 hardware_interface:
   joints:
-    - phi_1
     - theta_1
     - beta_1
     - gamma_1
-    - phi_2
     - theta_2
     - beta_2
     - gamma_2
-    - phi_3
     - theta_3
     - beta_3
     - gamma_3

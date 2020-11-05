@@ -4,8 +4,14 @@ controller_list:
     type: FollowJointTrajectory
     joints:
       - theta_1
+      - beta_1
+      - gamma_1
       - theta_2
+      - beta_2
+      - gamma_2
       - theta_3
+      - beta_3
+      - gamma_3
       - x
       - y
       - z

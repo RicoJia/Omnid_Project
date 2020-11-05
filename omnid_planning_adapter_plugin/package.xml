@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>omnid_planning_adapter_plugin</name>
+  <version>0.1.0</version>
+  <description>Planning adapter for post-processing planning results for the Omnid Delta Arm Project  </description>
+
+  <maintainer email="ruotongjia2020@u.northwestern.edu">Rico Ruotong Jia</maintainer>
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>moveit_core</build_depend>
+  <build_depend>moveit_ros_planning</build_depend>
+  <build_depend>pluginlib</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_export_depend>moveit_core</build_export_depend>
+  <build_export_depend>moveit_ros_planning</build_export_depend>
+  <build_export_depend>pluginlib</build_export_depend>
+  <build_export_depend>roscpp</build_export_depend>
+  <exec_depend>moveit_core</exec_depend>
+  <exec_depend>moveit_ros_planning</exec_depend>
+  <exec_depend>pluginlib</exec_depend>
+  <exec_depend>roscpp</exec_depend>
+  <depend>omnid_core_all</depend>
+  <build_depend>cmakeme</build_depend>
+
+  <export>
+    <moveit_core plugin="${prefix}/omnid_planning_adapter_plugin.xml"/>
+  </export>
+</package>

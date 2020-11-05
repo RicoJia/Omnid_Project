@@ -1,0 +1,5 @@
+<library path="lib/libomnid_planning_adapter_plugin">
+    <class name="omnid_planning_adapter_plugin/OmnidPlanningRequestAdapter" type="omnid_planning_adapter_plugin::OmnidPlanningRequestAdapter" base_class_type="planning_request_adapter::PlanningRequestAdapter">
+        <description>Planning adapter for post-processing planning results for the Omnid Delta Arm Project </description>
+    </class>
+</library>

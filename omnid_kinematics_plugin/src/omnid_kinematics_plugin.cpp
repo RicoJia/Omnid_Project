@@ -4,10 +4,8 @@
 #include <srdfdom/model.h>
 #include <moveit/rdf_loader/rdf_loader.h>
 #include "omnid_core/delta_robot.h"
-
-
-//TODO
-//#include <omnid_kinematics_plugin/omnid_kinematics_plugin.h>
+#include <cmath>
+#include <omnid_kinematics_plugin/omnid_kinematics_plugin.h>
 #include <../include/omnid_kinematics_plugin/omnid_kinematics_plugin.h>
 
 CLASS_LOADER_REGISTER_CLASS(omnid_kinematics::OmnidKinematicsPlugin, kinematics::KinematicsBase)
@@ -43,6 +41,10 @@ namespace omnid_kinematics{
         // We also skips single DOF joint checking, since we only care about the after spring joints
 
         // store joint names, joint limits, and the tip info into the IK & FK Chains
+        //TODO
+        std::string theta_name = "theta";
+        std::string gamma_name = "gamma";
+        std::string beta_name = "beta";
         dimension_ = joint_model_group->getActiveJointModels().size() + joint_model_group->getMimicJointModels().size();
         for (std::size_t i=0; i < joint_model_group->getJointModels().size(); ++i)
         {
@@ -52,12 +54,21 @@ namespace omnid_kinematics{
                 ik_chain_info_.joint_names.push_back(joint_model_group->getJointModelNames()[i]);
                 const std::vector<moveit_msgs::JointLimits> &jvec = jm->getVariableBoundsMsg();
                 ik_chain_info_.limits.insert(ik_chain_info_.limits.end(), jvec.begin(), jvec.end());
-
                 if(jm->getType() == moveit::core::JointModel::REVOLUTE)
                 {
                     //first check whether it belongs to the set of active joints in the group
                     if (jm->getMimic() == NULL && jm->getVariableCount() > 0) {
-                        actuated_joint_names_.push_back(joint_model_group->getJointModelNames()[i]);
+                        std::string name = jm->getName();
+                        if(name.find(theta_name) != std::string::npos){
+                            actuated_joint_names_.push_back(name);
+//                            actuated_joint_names_.push_back(joint_model_group->getJointModelNames()[i]);
+                        }
+                        else if(name.find(gamma_name) != std::string::npos){
+                            gamma_joint_names_.push_back(name);
+                        }
+                        else if(name.find(beta_name) != std::string::npos){
+                            beta_joint_names_.push_back(name);
+                        }
                     }
                     else if (jm->getMimic() && joint_model_group->hasJointModel(jm->getMimic()->getName())){
                         mimic_joint_arr_.push_back(jm);
@@ -86,63 +97,9 @@ namespace omnid_kinematics{
 
         for(unsigned int i=0; i < ik_chain_info_.limits.size(); i++)
         {
-            joint_min_.push_back(ik_chain_info_.limits[i].min_position);
-            joint_max_.push_back(ik_chain_info_.limits[i].max_position);
+            joint_min_.at(i) = ik_chain_info_.limits[i].min_position;
+            joint_max_.at(i) = ik_chain_info_.limits[i].max_position;
         }
-
-        //TODO joint_model_group -> getMimicJointModels(), return a vector of JointModels
-        //TODO joint_model_group -> getJointModelNames, for names
-
-
-        // Check for mimic joints
-//        bool has_mimic_joints = joint_model_group->getMimicJointModels().size() > 0;
-//        std::vector<unsigned int> redundant_joints_map_index;
-//        std::vector<kdl_kinematics_plugin::JointMimic> mimic_joints;
-//        unsigned int joint_counter = 0;
-//        for (std::size_t i = 0; i < kdl_chain_.getNrOfSegments(); ++i)
-//        {
-//            const robot_model::JointModel *jm = robot_model_->getJointModel(kdl_chain_.segments[i].getJoint().getName());
-//
-//            //first check whether it belongs to the set of active joints in the group
-//            if (jm->getMimic() == NULL && jm->getVariableCount() > 0)
-//            {
-//                kdl_kinematics_plugin::JointMimic mimic_joint;
-//                mimic_joint.reset(joint_counter);
-//                mimic_joint.joint_name = kdl_chain_.segments[i].getJoint().getName();
-//                mimic_joint.active = true;
-//                mimic_joints.push_back(mimic_joint);
-//                ++joint_counter;
-//                continue;
-//            }
-//            if (joint_model_group->hasJointModel(jm->getName()))
-//            {
-//                if (jm->getMimic() && joint_model_group->hasJointModel(jm->getMimic()->getName()))
-//                {
-//                    kdl_kinematics_plugin::JointMimic mimic_joint;
-//                    mimic_joint.reset(joint_counter);
-//                    mimic_joint.joint_name = kdl_chain_.segments[i].getJoint().getName();
-//                    mimic_joint.offset = jm->getMimicOffset();
-//                    mimic_joint.multiplier = jm->getMimicFactor();
-//                    mimic_joints.push_back(mimic_joint);
-//                    continue;
-//                }
-//            }
-//        }
-//        for (std::size_t i = 0; i < mimic_joints.size(); ++i)
-//        {
-//            if(!mimic_joints[i].active)
-//            {
-//                const robot_model::JointModel* joint_model = joint_model_group->getJointModel(mimic_joints[i].joint_name)->getMimic();
-//                for(std::size_t j=0; j < mimic_joints.size(); ++j)
-//                {
-//                    if(mimic_joints[j].joint_name == joint_model->getName())
-//                    {
-//                        mimic_joints[i].map_index = mimic_joints[j].map_index;
-//                    }
-//                }
-//            }
-//        }
-//        mimic_joints_ = mimic_joints;
 
         // Setup the joint state groups that we need
         state_.reset(new robot_state::RobotState(robot_model_));
@@ -150,6 +107,14 @@ namespace omnid_kinematics{
 
         active_ = true;
         ROS_INFO_NAMED("omnid_kinematics_plugin","omnid_kinematics_plugin initialized");
+
+
+        //TODO
+        for(unsigned int i = 0; i < ik_chain_info_.joint_names.size(); ++i){
+            ROS_INFO_STREAM("joint_name: "<<  ik_chain_info_.joint_names.at(i));
+            ROS_INFO_STREAM("link_name: "<<  fk_chain_info_.link_names.at(i));
+        }
+
         return true;
     }
 
@@ -259,42 +224,70 @@ namespace omnid_kinematics{
             return false;
         }
 
-        //Solving IK here
-        const struct type_linear_position pos = {.x = ik_pose.position.x, .y = ik_pose.position.y, .z = ik_pose.position.z};
-        struct type_angular_position out;
-////        delta_robot_inverse_kinematics(&delta_robot, &pos, &out);
-        delta_robot_inverse_kinematics(&DELTA_ROBOT, &pos, &out);
-        std::vector<double> out_vec{out.theta1, out.theta2, out.theta3};
+        //Fill in the x, y, z prismatic joints
         std::vector<double> pose_vec{ik_pose.position.x, ik_pose.position.y, ik_pose.position.z};
+
         solution = std::vector<double>(dimension_, 0);
 
-        // here solution element is in the same order as theta1, 2, 3
-        for (unsigned int i = 0; i < actuated_joint_names_.size(); ++i) {
-            const std::string joint_name = actuated_joint_names_.at(i);
-            solution.at(getJointIndex(joint_name)) = out_vec.at(i);
-        }
         for (unsigned int i = 0; i < end_effector_joint_names_.size(); ++i) {
             const std::string joint_name = end_effector_joint_names_.at(i);
             solution.at(getJointIndex(joint_name)) = pose_vec.at(i);
         }
 
-//        for(const auto& joint:mimic_joint_arr_){
-//            solution.at(getJointIndex(joint->getName())) = cheat_mimic_angle;
-//        }
+        //Solving IK for after-spring angles
+        const struct type_linear_position pos = {.x = ik_pose.position.x, .y = ik_pose.position.y, .z = ik_pose.position.z};
+        struct type_angular_position thetas;
+        delta_robot_inverse_kinematics(&DELTA_ROBOT, &pos, &thetas);
+        std::vector<double> thetas_vec{thetas.theta1, thetas.theta2, thetas.theta3};
 
-        error_code.val = error_code.SUCCESS;
-        ROS_INFO_NAMED("omnid_kinematics_plugin","HEHEHE IK");
-        for (auto& i : ik_chain_info_.joint_names){
-            ROS_INFO_STREAM("omnid_kinematics_plugin joint name: " <<i);
+        // Solution elements are in the same order as theta1, 2, 3
+        for (unsigned int i = 0; i < actuated_joint_names_.size(); ++i) {
+            const std::string joint_name = actuated_joint_names_.at(i);
+            if (std::isnan(thetas_vec.at(i))) {
+                ROS_WARN_STREAM(joint_name<<" hitting singularity. cannot plan. ");
+                error_code.val = error_code.NO_IK_SOLUTION;
+                return false;
+            }
+            int joint_index = getJointIndex(joint_name);
+            // apply joint limits here
+            if(joint_min_.at(joint_index) > thetas_vec.at(i) || joint_max_.at(joint_index) < thetas_vec.at(i)){
+                ROS_WARN_STREAM(joint_name << " is hitting joint limits");
+                error_code.val = error_code.NO_IK_SOLUTION;
+                return false;
+            }
+
+            solution.at(joint_index) = thetas_vec.at(i);
         }
-        return true;
+        // Solving for knee angles
+        struct delta_robot_knee_angles knees;
+        delta_robot_knees(&DELTA_ROBOT, &pos, &thetas, &knees);
+        std::vector<double> gammas_vec{knees.gamma[0], knees.gamma[1], knees.gamma[2]};
+        std::vector<double> betas_vec{knees.beta[0], knees.beta[1], knees.beta[2]};
+        for (unsigned int i = 0; i < beta_joint_names_.size(); ++i) {
+            const std::string beta_joint_name = beta_joint_names_.at(i);
+            const std::string gamma_joint_name = gamma_joint_names_.at(i);
+            solution.at(getJointIndex(beta_joint_name)) = betas_vec.at(i);
+            solution.at(getJointIndex(gamma_joint_name)) = gammas_vec.at(i);
+        }
+
+        // see if this solution passes the callback function test
+        if(!solution_callback.empty())
+            solution_callback(ik_pose, solution, error_code);
+        else
+            error_code.val = error_code.SUCCESS;
+        if (error_code.val == error_code.SUCCESS)
+            return true;
+        else{
+            ROS_DEBUG_NAMED("kdl","An IK that satisifes the constraints and is collision free could not be found");
+            error_code.val = error_code.NO_IK_SOLUTION;
+            return false;
+        }
 
     }
 
     bool OmnidKinematicsPlugin::getPositionFK(const std::vector<std::string> &link_names,
                                            const std::vector<double> &joint_angles,
                                            std::vector<geometry_msgs::Pose> &poses) const {
-        ros::WallTime n1 = ros::WallTime::now();
         if (!active_) {
             ROS_ERROR_NAMED("omnid_kinematics_plugin", "kinematics not active");
             return false;
@@ -305,12 +298,30 @@ namespace omnid_kinematics{
             return false;
         }
 
+        // calculating thetas
+        std::vector<double> thetas_vec(actuated_joint_names_.size(), 0);
+        for (unsigned int i = 0; i < actuated_joint_names_.size(); ++i) {
+            const std::string joint_name = actuated_joint_names_.at(i);
+            int joint_index = getJointIndex(joint_name);
+            // apply joint limits here
+            if(joint_min_.at(joint_index) > joint_angles.at(joint_index) || joint_max_.at(joint_index) < joint_angles.at(joint_index)){
+                ROS_WARN_STREAM(joint_name << " in Omnid Forward-Kinematics Request is out of its joint limit");
+                return false;
+            }
+        }
+        struct type_angular_position joints;
+        struct type_linear_position xyz_pose;
+        joints.theta1 = thetas_vec.at(0);
+        joints.theta2 = thetas_vec.at(1);
+        joints.theta3 = thetas_vec.at(2);
+        delta_robot_forward_kinematics(&DELTA_ROBOT, &joints, &xyz_pose);
+
+        geometry_msgs::Pose end_effector_pose;
+        end_effector_pose.position.x = xyz_pose.x;
+        end_effector_pose.position.y = xyz_pose.y;
+        end_effector_pose.position.z = xyz_pose.z;
+        poses.push_back(end_effector_pose);
         //TODO
-        geometry_msgs::Pose cheat_pose;
-        cheat_pose.position.x = 0.5;
-        cheat_pose.position.y = 0.5;
-        cheat_pose.position.z = 0.5;
-        poses.push_back(cheat_pose);
         ROS_INFO_NAMED("omnid_kinematics_plugin","HEHEHE FK");
         return true;
     }

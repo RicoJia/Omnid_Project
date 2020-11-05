@@ -13,21 +13,36 @@
         <link name="platform_link"/>
     </group>
     <group name="end_effector_arm">
+        <joint name="lower_leg_attach_joint_1"/>
+        <joint name="theta_1"/>
+        <joint name="beta_1"/>
+        <joint name="gamma_1"/>
+        <joint name="mimic_gamma_1"/>
+        <joint name="mimic_beta_1"/>
+        <joint name="extra_knee_lower_leg_1"/>
+        <joint name="mimic_theta_1"/>
+        <joint name="mimic_theta_link_floating_world_1"/>
+        <joint name="lower_leg_attach_joint_2"/>
+        <joint name="theta_2"/>
+        <joint name="beta_2"/>
+        <joint name="gamma_2"/>
+        <joint name="mimic_gamma_2"/>
+        <joint name="mimic_beta_2"/>
+        <joint name="extra_knee_lower_leg_2"/>
+        <joint name="mimic_theta_2"/>
+        <joint name="mimic_theta_link_floating_world_2"/>
+        <joint name="lower_leg_attach_joint_3"/>
+        <joint name="theta_3"/>
+        <joint name="beta_3"/>
+        <joint name="gamma_3"/>
+        <joint name="mimic_gamma_3"/>
+        <joint name="mimic_beta_3"/>
+        <joint name="extra_knee_lower_leg_3"/>
+        <joint name="mimic_theta_3"/>
+        <joint name="mimic_theta_link_floating_world_3"/>
         <joint name="x"/>
         <joint name="y"/>
         <joint name="z"/>
-        <joint name="mimic_theta_link_floating_world_3"/>
-        <joint name="mimic_theta_3"/>
-        <joint name="theta_3"/>
-        <joint name="lower_leg_attach_joint_3"/>
-        <joint name="mimic_theta_link_floating_world_2"/>
-        <joint name="mimic_theta_2"/>
-        <joint name="theta_2"/>
-        <joint name="lower_leg_attach_joint_2"/>
-        <joint name="mimic_theta_link_floating_world_1"/>
-        <joint name="mimic_theta_1"/>
-        <joint name="theta_1"/>
-        <joint name="lower_leg_attach_joint_1"/>
     </group>
     <!--GROUP STATES: Purpose: Define a named state for a particular group, in terms of joint values. This is useful to define states like 'folded arms'-->
     <group_state name="home" group="end_effector">
@@ -38,18 +53,12 @@
     <!--VIRTUAL JOINT: Purpose: this element defines a virtual joint between a robot link and an external frame of reference (considered fixed with respect to the robot)-->
     <virtual_joint name="FixedBase" type="fixed" parent_frame="world" child_link="world"/>
     <!--PASSIVE JOINT: Purpose: this element is used to mark joints that are not actuated-->
-    <passive_joint name="phi_1"/>
-    <passive_joint name="beta_1"/>
-    <passive_joint name="gamma_1"/>
     <passive_joint name="mimic_theta_1"/>
-    <passive_joint name="phi_2"/>
-    <passive_joint name="beta_2"/>
-    <passive_joint name="gamma_2"/>
     <passive_joint name="mimic_theta_2"/>
-    <passive_joint name="phi_3"/>
-    <passive_joint name="beta_3"/>
-    <passive_joint name="gamma_3"/>
     <passive_joint name="mimic_theta_3"/>
+    <passive_joint name="phi_1"/>
+    <passive_joint name="phi_2"/>
+    <passive_joint name="phi_3"/>
     <!--DISABLE COLLISIONS: By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. This tag disables collision checking between a specified pair of links. -->
     <disable_collisions link1="base_link" link2="lower_leg_1" reason="Never"/>
     <disable_collisions link1="base_link" link2="lower_leg_2" reason="Never"/>

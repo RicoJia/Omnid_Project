@@ -218,7 +218,7 @@ namespace omnid_kinematics{
                                 double search_discretization);
 
         /**
-         * @brief Given a set of joint angles and a set of links, compute their pose
+         * @brief Given a set of joint angles and a set of links, compute their pose - Moveit! does not call this function, but an external user might.
          * @param link_names A set of links for which FK needs to be computed
          * @param joint_angles The state for which FK is being computed
          * @param poses The resultant set of poses (in the frame returned by getBaseFrame())
@@ -247,6 +247,8 @@ namespace omnid_kinematics{
         moveit_msgs::KinematicSolverInfo fk_chain_info_; /** Store information for the forward kinematics solver */
         moveit_msgs::KinematicSolverInfo ik_chain_info_; /** Stores information of all joints */
         std::vector<std::string> actuated_joint_names_;  /** Stores names of the actuated joints, such as theta_1*/
+        std::vector<std::string> beta_joint_names_;  /** Stores names of the beta knee joints, see the inverse kinematics pdf*/
+        std::vector<std::string> gamma_joint_names_;  /** Stores names of the gamma knee joints, see the inverse kinematics pdf*/
         std::vector<std::string> end_effector_joint_names_;     /**Stores names of the end effectors' prismatic joints */
         std::vector<const robot_model::JointModel*> mimic_joint_arr_;    /** Stores all mimic joints in an array*/
 

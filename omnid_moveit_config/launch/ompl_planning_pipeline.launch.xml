@@ -11,7 +11,8 @@
               default_planner_request_adapters/FixWorkspaceBounds
               default_planner_request_adapters/FixStartStateBounds
               default_planner_request_adapters/FixStartStateCollision
-              default_planner_request_adapters/FixStartStatePathConstraints"
+              default_planner_request_adapters/FixStartStatePathConstraints
+              omnid_planning_adapter_plugin/OmnidPlanningRequestAdapter"
               />
 
   <arg name="start_state_max_bounds_error" value="0.1" />
