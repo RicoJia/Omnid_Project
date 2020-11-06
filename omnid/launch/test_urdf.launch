@@ -1,7 +1,9 @@
 <launch>
-     <arg name="test_serial_urdf" default="true" doc="True if we visualize the Serialized Delta Arm for Moveit"/>
+    <arg name="test_serial_urdf" default="false" doc="True if we visualize the Serialized Delta Arm for Moveit"/>
+    <arg name="test_parallel_urdf" default="false" doc="True if we visualize the regular parallel Delta Arm for Moveit"/>
+    <arg name="test_disk_urdf" default="false" doc="True if we visualize a circular object for the Delta Arm to carry"/>
 
-     <arg name="urdf_for_pybullet" default="$(find xacro)/xacro --inorder $(find omnid)/urdf/delta_robot.urdf.xacro
+     <arg name="urdf_parallel" default="$(find xacro)/xacro --inorder $(find omnid)/urdf/delta_robot_pybullet.urdf.xacro
        R_base:=0.18
        h_base:=0.009525
        M_base:=2.5
@@ -12,7 +14,7 @@
        L_upper:=0.368
        base_offset:=0.046375
        "/>
-    <arg name="urdf_serial" default="$(find xacro)/xacro --inorder $(find omnid)/urdf/delta_robot_for_moveit.urdf.xacro
+    <arg name="urdf_serial" default="$(find xacro)/xacro --inorder $(find omnid)/urdf/delta_robot_moveit.urdf.xacro
        R_base:=0.18
        h_base:=0.009525
        M_base:=2.5
@@ -23,8 +25,14 @@
        L_upper:=0.368
        base_offset:=0.046375
        "/>
-    <param name="robot_description" command="$(arg urdf_for_pybullet)" unless="$(arg test_serial_urdf)"/>
+    <arg name="urdf_disk" default="$(find xacro)/xacro --inorder $(find omnid)/urdf/disk.urdf.xacro
+       R_disk:=1.0
+       h_disk:=0.1
+       M_disk:=2.5
+       "/>
     <param name="robot_description" command="$(arg urdf_serial)" if="$(arg test_serial_urdf)"/>
+    <param name="robot_description" command="$(arg urdf_parallel)" if="$(arg test_parallel_urdf)"/>
+    <param name="robot_description" command="$(arg urdf_disk)" if="$(arg test_disk_urdf)"/>
 
 
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>

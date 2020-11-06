@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="disk">
+
+  <!--  a circular disk object for carrying. The link frame is positioned at the bottom of the link -->
+
+  <!-- Radius of the base of the delta robot -->
+  <xacro:property name="R_disk" value="$(arg R_disk)" />
+
+  <!-- height (i.e. thickness) of the base -->
+  <xacro:property name="h_disk" value="$(arg h_disk)" />
+
+  <!-- mass of the base -->
+  <xacro:property name="M_disk" value="$(arg M_disk)" />
+
+
+  <!-- Compute inertial properties for a cylinder, where the reference frame is centered.
+       The axis of the cylinder-->
+
+  <xacro:macro name="cylinder_inertia" params="M R h axis">
+    <inertial>
+      <mass value="${M}" />
+      <origin xyz="${0 if axis =='z' else h/2.0} 0 ${h/2.0 if axis=='z' else 0}" rpy="0 0 0" />
+      <xacro:property name="Iradial" value = "${M*h**2/12.0 + M*R**2/4.0}"/>
+      <xacro:property name="Iaxial" value = "${M*R**2/2.0}" />
+      <inertia ixx= "${Iradial if axis == 'z' else Iaxial}"
+               ixy="0"
+               ixz="0"
+               iyy= "${Iradial}"
+               iyz="0"
+               izz="${Iaxial if axis == 'z' else Iradial}"
+      />
+    </inertial>
+  </xacro:macro>
+
+  <xacro:macro name="cylinder_collision" params="M R h axis">
+    <collision>
+      <origin xyz="${0 if axis == 'z' else h/2.0} 0 ${h/2.0 if axis == 'z' else 0}" rpy="0 ${0 if axis == 'z' else -pi/2.0} 0" />
+      <geometry>
+        <cylinder radius="${R}" length="${h}" />
+      </geometry>
+    </collision>
+  </xacro:macro>
+
+  <!-- Create a visual cylinder with the given name that is a cylinder with mass M,
+       radius R, height h, and the given material.
+       if axis == 'z' the cylinder is aligned with the z axis otherwise it is aligned
+       with the x axis.
+   -->
+  <xacro:macro name="cylinder_visual" params="M R h axis mat">
+    <visual>
+      <origin xyz="${0 if axis == 'z' else h/2.0} 0 ${h/2.0 if axis == 'z' else 0}" rpy="0 ${0 if axis == 'z' else -pi/2.0} 0" />
+      <geometry>
+        <cylinder radius="${R}" length="${h}" />
+        </geometry>
+        <material name="${mat}" />
+    </visual>
+  </xacro:macro>
+
+  <!-- Create a cylindrical link with visual and inertial properties
+       name - the name of the link
+       M - the mass of the link
+       R - the radius
+       h - the height
+       axis - z to align with z axis, x to align with x axis
+       mat - the material
+   -->
+  <xacro:macro name="cylinder_link" params="name M R h axis mat">
+    <link name="${name}">
+      <xacro:cylinder_visual M="${M}" R="${R}" h="${h}" axis="${axis}" mat="${mat}" />
+      <xacro:cylinder_inertia M="${M}" R="${R}" h="${h}" axis="${axis}" />
+      <xacro:cylinder_collision M="${M}" R="${R}" h="${h}" axis="${axis}"/>
+    </link>
+  </xacro:macro>
+
+  <!-- define colors -->
+  <material name="yellow" >
+	<color rgba="1.0 1.0 0.0 1.0"/>
+  </material>
+
+  <!-- define the base of the delta robot-->
+  <xacro:cylinder_link name="base_link"
+                         M="${M_disk}"
+                         R="${R_disk}"
+                         h="${h_disk}"
+                         axis="z"
+                         mat="yellow"
+  />
+
+</robot>

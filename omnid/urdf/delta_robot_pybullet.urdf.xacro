@@ -88,7 +88,7 @@ line program has not been written
 
       <!-- shift the origin to the center of the link from the end. how this is done depends on if
       the cylinder is x aligned or z aligned-->
-      <origin xyz="${0 if axis =='z' else h/2.0} 0 ${h/2.0 if axis=='z' else 0}" rpy="0 0 0" />
+<!--      <origin xyz="${0 if axis =='z' else h/2.0} 0 ${h/2.0 if axis=='z' else 0}" rpy="0 0 0" />-->
 
       <!-- formulas for inertia matrix components along radial and axial axes -->
       <xacro:property name="Iradial" value = "${M*h**2/12.0 + M*R**2/4.0}"/>
@@ -139,7 +139,7 @@ line program has not been written
       <link name="${name}">
         <xacro:cylinder_visual M="${M}" R="${R}" h="${h}" axis="${axis}" mat="${mat}" />
         <xacro:cylinder_inertia M="${M}" R="${R}" h="${h}" axis="${axis}" />
-        <xacro:cylinder_collision M="${M}" R="${R}" h="${h}" axis="{axis}"/>
+        <xacro:cylinder_collision M="${M}" R="${R}" h="${h}" axis="${axis}"/>
       </link>
     </xacro:macro>
  

@@ -139,7 +139,7 @@ line program has not been written
     <link name="${name}">
       <xacro:cylinder_visual M="${M}" R="${R}" h="${h}" axis="${axis}" mat="${mat}" />
       <xacro:cylinder_inertia M="${M}" R="${R}" h="${h}" axis="${axis}" />
-      <xacro:cylinder_collision M="${M}" R="${R}" h="${h}" axis="{axis}"/>
+      <xacro:cylinder_collision M="${M}" R="${R}" h="${h}" axis="${axis}"/>
     </link>
   </xacro:macro>
 

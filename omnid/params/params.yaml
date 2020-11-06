@@ -1,3 +1,8 @@
+########################### Delta Arm Group Params ###########################
+base_positions: [[0.0, 0.0, 0.0], [1.0, 0.0, 0.0], [0.5, 0.5, 0.0]]   #Cartesian coordinates of the base_link frames
+h_platform: 0.01 #delta_arm_end_effector_thickness
+
+########################### Single Delta Arm Params
 base_offset: 0.046375   #how much the base should be lifted to bring to the ground.
 leg_num: 3      #total number of legs
 
@@ -15,7 +20,7 @@ upper_leg_length: 0.368   #length of the upper leg, see URDF
 
 # We initialize our arm with identical pre_spring joint values (radians)
 pre_spring_joint_info: {"phi": 0.70}   #name of the pre_spring_joint: joint_initial_value
-after_spring_joint_info: {"theta":0.90} #name of the after_spring_joint: joint_initial_value
+after_spring_joint_info: {"theta":1.50} #name of the after_spring_joint: joint_initial_value
 
 end_effector_initial_xyz: {"x":0.0, "y":0.0, "z":0.42}
 end_effector_thickness: 0.01   #thickness of the end effector platform
@@ -38,6 +43,6 @@ controller_namespace: "end_effector_arm_controller"   #action_ns of omnid_moveit
 
 #Test parameters. For production default value is false for every item here
 after_spring_actuated: true   #By default, the pre-spring joints are actuated. However, that requires a PID controller. For testing purposes, we can apply control directly on after-spring joints.
-test_joint_control: false #enable direct joint level control on pre_spring joints (phi)
+test_joint_control: true #enable direct joint level control on pre_spring joints (phi)
 test_with_end_effector_xyz: false  #enable actuation on the end-effector x, y, z joints, which means other joint control will not be effective. Note that you have to set test_mode_on to start testing.
 test_without_spring: true

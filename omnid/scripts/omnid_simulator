@@ -13,6 +13,7 @@ import pybullet_data
 from omnid_model import Omnid_Model
 import roslib
 from sensor_msgs.msg import JointState
+from disk import Disk
 
 import actionlib
 
@@ -25,9 +26,16 @@ from control_msgs.msg import FollowJointTrajectoryResult
 
 roslib.load_manifest("omnid")
 
-class Omnid_Simulator:
-  def __init__(self, urdf_path):
-    self.joint_state_pub = rospy.Publisher('omnid/joint_states', JointState, queue_size=10)
+class OmnidArmROS:
+  def __init__(self, urdf_path, base_position = [0,0], id = None):
+    """
+    initialize an Omnid Arm with ROS interface
+    :param urdf_path: string, Relative path (to the root of the package) to the URDF directory
+    :param base_position: list like [x,y] of the center of the base of the robot
+    :param id: int, id of the arm. If none, all topics and actions will not be labeled. Else, they will be labeled like "topic_name_id".
+    """
+    id_suffix = '_' + str(id) if id is not None else ''
+    self.joint_state_pub = rospy.Publisher('omnid/joint_states' + id_suffix, JointState, queue_size=10)
     use_spring = not(rospy.get_param("~test_without_spring", False))
     test_with_end_effector_xyz = rospy.get_param("~test_with_end_effector_xyz")
     after_spring_actuated = rospy.get_param("~after_spring_actuated")
@@ -36,19 +44,19 @@ class Omnid_Simulator:
                                    use_spring=use_spring,
                                    test_with_end_effector_xyz=test_with_end_effector_xyz,
                                    after_spring_actuated = after_spring_actuated,
-                                   urdf_name = urdf_name)
-
-
+                                   urdf_name = urdf_name, 
+                                   base_position = base_position)
     test_joint_control = rospy.get_param("~test_joint_control")
     if test_joint_control:
-      self.joint_state_sub = rospy.Subscriber('joint_states_control', JointState, self.updateJointStates_CB)
+      self.joint_state_sub = rospy.Subscriber('joint_states_control'+id_suffix, JointState, self.updateJointStates_CB)
     else:
       controller_namespace = rospy.get_param("~controller_namespace")
-      self.action_server = actionlib.SimpleActionServer(controller_namespace + '/follow_joint_trajectory',
-                                                            FollowJointTrajectoryAction,
-                                                            execute_cb=self.processFollowTrajectory,
-                                                            auto_start=False)
-      self.action_server.start()
+      # TODO - See interface with Moveit!
+      # self.action_server = actionlib.SimpleActionServer(controller_namespace + '/follow_joint_trajectory',
+      #                                                       FollowJointTrajectoryAction,
+      #                                                       execute_cb=self.processFollowTrajectory,
+      #                                                       auto_start=False)
+      # self.action_server.start()
 
   def jointStatesPub(self):
     self.joint_state_pub.publish(self.omnid_model.returnJointStateMsg())
@@ -94,11 +102,45 @@ class Omnid_Simulator:
           res = FollowJointTrajectoryResult()
           self.action_server.set_succeeded(result=res, text=msg)
 
+def getCentroid(points):
+    """
+    return the centroid of massless points
+    :param points: list of mass less point's [x, y, z]
+    :return: [x, y, z]
+    """
+    return np.array([sum( [ps[0] for ps in base_positions] ),
+                     sum( [ps[1] for ps in base_positions] ),
+                     sum( [ps[2] for ps in base_positions] )])\
+           /len(base_positions)
+
+def connectObjectToOmnids(omnid_arms_ros, object):
+    """
+    We place the object right on top of the omnid arms. We assume given the object spawn position, the object is large enough to be connected
+    to the omnid arms. We also assume that the object is spawned right on top of the delta arm platforms.
+    :param omnid_arms_ros: list of omnid_arm_ros objects
+    :param object: object to be carried
+    """
+    spawn_position = object.getObjectInfo()["spawn_position"]
+    maxPoint2PointForce = 500000
+    for id in range(len(omnid_arms_ros)):
+        platform_pos = np.array(omnid_arms_ros[id].omnid_model.getEndEffectorPosition())
+        platform_top = np.array([platform_pos[0], platform_pos[1], spawn_position[2]])    #assume that the object is spawned right on top of the delta arm platforms.
+        child_frame_pos = platform_top - platform_pos
+        parent_frame_pos = platform_top - spawn_position  # Cartesian coordnates on the platform, r_platform = 0.062
+        joint_axis = [0,0,0]
+        print("parent_frame_pos: ", parent_frame_pos)
+        print("omnid_arms_ros[id].omnid_model.getEndEffectorLinkID(): ", omnid_arms_ros[id].omnid_model.getEndEffectorLinkID())
+
+        new_joint_id = p.createConstraint(object.model_unique_id, object.getEndEffectorLinkID(), #we assume base_link of the object is the first link of the object
+                                          omnid_arms_ros[id].omnid_model.model_unique_id, omnid_arms_ros[id].omnid_model.getEndEffectorLinkID(),
+                                          p.JOINT_POINT2POINT, joint_axis, parent_frame_pos, child_frame_pos)
+        p.changeConstraint(new_joint_id, maxForce=maxPoint2PointForce)
+
 
 if __name__ == "__main__":
     try:
       rospy.init_node("omnid_node")
-      c = p.connect(p.SHARED_MEMORY)
+      c = p.connect(p.SHARED_MEMORY)     # or p.DIRECT for non-graphical version
       if (c < 0):
         c = p.connect(p.GUI)
       p.setAdditionalSearchPath(pybullet_data.getDataPath())
@@ -106,151 +148,37 @@ if __name__ == "__main__":
       p.loadURDF("plane.urdf" )  #loads from the root pybullet library
       p.setGravity(0, 0, -10.0)
       urdf_path = ((rospkg.RosPack()).get_path('omnid'))+'/urdf'
-      omnid_simulator = Omnid_Simulator(urdf_path)
-
+      base_positions = rospy.get_param("~base_positions")
+      omnid_arms_ros = []
       p.setRealTimeSimulation(0)
 
+      #initialize the arms [0, 1 ...]
+      omnid_num = len(base_positions)
+      for id in range(omnid_num):
+          base_position = base_positions[id]
+          omnid_arm_ros = OmnidArmROS(urdf_path, id=id, base_position=base_position)
+          omnid_arms_ros.append(omnid_arm_ros)
+      #Initialize a disk
+      spawn_position = getCentroid(base_positions)
+      spawn_position[2] = omnid_arms_ros[0].omnid_model.getEndEffectorPosition()[2] + rospy.get_param("~h_platform") + 0.1
+      print("z: ", spawn_position[2])
+      disk = Disk(urdf_path, spawn_position = spawn_position)
+
+      #connect the disk to the omnids
+      connectObjectToOmnids(omnid_arms_ros, disk)
+
       # global joint_values
-      timeStep = 0.001
+      timeStep = 0.0005
       r = rospy.Rate(1.0/timeStep)
       p.setTimeStep(timeStep)
+
+
       while p.isConnected() and not rospy.is_shutdown():
-        omnid_simulator.executeMotionCommands()
-        omnid_simulator.jointStatesPub()
+        for omnid_arm_ros in omnid_arms_ros:
+            # omnid_arm_ros.executeMotionCommands()
+            omnid_arm_ros.jointStatesPub()
         p.stepSimulation()
         r.sleep()
+      p.disconnect()
     except rospy.ROSInterruptException:
         pass
-
-#############################################
-#
-#         trajectory = []
-#         time = rospy.Time.now() + rospy.Duration(0.01)
-#
-#         # every single time, get the start time (?), push every single joint as a "segment" into a trajectory,
-#         for i in range(num_points):
-#             seg = Segment(self.num_joints)
-#
-#             if traj.header.stamp == rospy.Time(0.0):
-#                 seg.start_time = (time + traj.points[i].time_from_start).to_sec() - durations[i]
-#             else:
-#                 seg.start_time = (traj.header.stamp + traj.points[i].time_from_start).to_sec() - durations[i]
-#
-#             seg.duration = durations[i]
-#
-#             for j in range(self.num_joints):
-#                 if traj.points[i].velocities:
-#                     seg.velocities[j] = traj.points[i].velocities[lookup[j]]
-#                 if traj.points[i].positions:
-#                     seg.positions[j] = traj.points[i].positions[lookup[j]]
-#
-#             trajectory.append(seg)
-#
-#         rate = rospy.Rate(self.update_rate)
-#
-#         #wait until trajectory header time is larger (?)
-#         while traj.header.stamp > time:
-#             time = rospy.Time.now()
-#             rate.sleep()
-#
-#         end_time = traj.header.stamp + rospy.Duration(sum(durations))
-#         seg_end_times = [rospy.Time.from_sec(trajectory[seg].start_time + durations[seg]) for seg in range(len(trajectory))]
-#         self.trajectory = trajectory
-#         traj_start_time = rospy.Time.now()
-#
-# #        execute the motion commands
-#         for seg in range(len(trajectory)):
-#             # first point in trajectories calculated by OMPL is current position with duration of 0 seconds, skip it
-#             multi_packet = {}
-#
-#             for port, joints in self.port_to_joints.items():
-#                 vals = []
-#
-#                 for joint in joints:
-#                     j = self.joint_names.index(joint)
-#
-#                     start_position = self.joint_states[joint].current_pos
-#                     if seg != 0: start_position = trajectory[seg - 1].positions[j]
-#
-#                     desired_position = trajectory[seg].positions[j]
-#                     desired_velocity = max(self.min_velocity, abs(desired_position - start_position) / durations[seg])
-#
-#                     self.msg.desired.positions[j] = desired_position
-#                     self.msg.desired.velocities[j] = desired_velocity
-#
-#                     # probably need a more elegant way of figuring out if we are dealing with a dual controller
-#                     if hasattr(self.joint_to_controller[joint], "master_id"):
-#                         master_id = self.joint_to_controller[joint].master_id
-#                         slave_id = self.joint_to_controller[joint].slave_id
-#                         master_pos, slave_pos = self.joint_to_controller[joint].pos_rad_to_raw(desired_position)
-#                         spd = self.joint_to_controller[joint].spd_rad_to_raw(desired_velocity)
-#                         vals.append((master_id, master_pos, spd))
-#                         vals.append((slave_id, slave_pos, spd))
-#                     else:
-#                         motor_id = self.joint_to_controller[joint].motor_id
-#                         pos = self.joint_to_controller[joint].pos_rad_to_raw(desired_position)
-#                         spd = self.joint_to_controller[joint].spd_rad_to_raw(desired_velocity)
-#                         vals.append((motor_id, pos, spd))
-#
-#                 multi_packet[port] = vals
-#
-#             for port, vals in multi_packet.items():
-#                 self.port_to_io[port].set_multi_position_and_speed(vals)
-#
-#             while time < seg_end_times[seg]:
-#                 # check if new trajectory was received, if so abort current trajectory execution
-#                 # by setting the goal to the current position
-#                 if self.action_server.is_preempt_requested():
-#                     msg = 'New trajectory received. Aborting old trajectory.'
-#                     multi_packet = {}
-#
-#                     for port, joints in self.port_to_joints.items():
-#                         vals = []
-#
-#                         for joint in joints:
-#                             cur_pos = self.joint_states[joint].current_pos
-#
-#                             motor_id = self.joint_to_controller[joint].motor_id
-#                             pos = self.joint_to_controller[joint].pos_rad_to_raw(cur_pos)
-#
-#                             vals.append((motor_id, pos))
-#
-#                         multi_packet[port] = vals
-#
-#                     for port, vals in multi_packet.items():
-#                         self.port_to_io[port].set_multi_position(vals)
-#
-#                     self.action_server.set_preempted(text=msg)
-#                     rospy.logwarn(msg)
-#                     return
-#
-#                 rate.sleep()
-#                 time = rospy.Time.now()
-#
-#             # Verifies trajectory constraints
-#             for j, joint in enumerate(self.joint_names):
-#                 if self.trajectory_constraints[j] > 0 and self.msg.error.positions[j] > self.trajectory_constraints[j]:
-#                     res = FollowJointTrajectoryResult()
-#                     res.error_code=FollowJointTrajectoryResult.PATH_TOLERANCE_VIOLATED
-#                     msg = 'Unsatisfied position constraint for %s, trajectory point %d, %f is larger than %f' % \
-#                           (joint, seg, self.msg.error.positions[j], self.trajectory_constraints[j])
-#                     rospy.logwarn(msg)
-#                     self.action_server.set_aborted(result=res, text=msg)
-#                     return
-#
-#         # Check that we have ended inside the goal constraints (?)pos_constraint?
-#         for (joint, pos_error, pos_constraint) in zip(self.joint_names, self.msg.error.positions, self.goal_constraints):
-#             if pos_constraint > 0 and abs(pos_error) > pos_constraint:
-#                 res = FollowJointTrajectoryResult()
-#                 res.error_code=FollowJointTrajectoryResult.GOAL_TOLERANCE_VIOLATED
-#                 msg = 'Aborting because %s joint wound up outside the goal constraints, %f is larger than %f' % \
-#                       (joint, pos_error, pos_constraint)
-#                 rospy.logwarn(msg)
-#                 self.action_server.set_aborted(result=res, text=msg)
-#                 break
-#         else:
-#             msg = 'Trajectory execution successfully completed'
-#             rospy.loginfo(msg)
-#             res = FollowJointTrajectoryResult()
-#             res.error_code=FollowJointTrajectoryResult.SUCCESSFUL
-#             self.action_server.set_succeeded(result=res, text=msg)

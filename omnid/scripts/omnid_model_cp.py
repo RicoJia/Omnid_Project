@@ -15,7 +15,7 @@ class Omnid_Model:
 
   def reset(self, test_with_end_effector_xyz, after_spring_actuated, urdf_name, base_position):
     self.buildParamLists(test_with_end_effector_xyz, after_spring_actuated)
-    self.model_unique_id = p.loadURDF(self.urdfRootPath + "/" + urdf_name , basePosition=[base_position[0],base_position[1],base_position[2]+self.base_offset], useFixedBase=True)
+    self.model_unique_id = p.loadURDF(self.urdfRootPath + "/" + urdf_name , basePosition=[base_position[0],base_position[1],self.base_offset], useFixedBase=True)
     self.buildLookups()
     self.resetLinkFrictions(lateral_friction_coefficient=0)
     self.resetJointsAndMotors()
@@ -154,8 +154,8 @@ class Omnid_Model:
         upper_leg_name = self.upper_leg_names[leg_id]
         x = self.end_effector_radius * np.cos(self.leg_pos_on_end_effector[upper_leg_name])
         y = self.end_effector_radius * np.sin(self.leg_pos_on_end_effector[upper_leg_name])
-        parent_frame_pos = np.array([ x, y, 0.0])  # Cartesian coordnates on the platform, r_platform = 0.062
-        child_frame_pos = [self.upper_leg_length, 0.0, 0.0]   # L_upper = 0.368/2.0
+        parent_frame_pos = np.array([ x, y, -self.end_effector_thickness/2.0])  # Cartesian coordnates on the platform, r_platform = 0.062
+        child_frame_pos = [self.upper_leg_length/2.0, 0.0, 0.0]   # L_upper = 0.368/2.0
         new_joint_id = p.createConstraint(self.model_unique_id, self.linkNameToID[self.end_effector_name],
                                           self.model_unique_id, self.linkNameToID[upper_leg_name],
                                           p.JOINT_POINT2POINT, joint_axis, parent_frame_pos, child_frame_pos)
@@ -230,13 +230,6 @@ class Omnid_Model:
           if name_ls[i] in self.motorDict:
               self.motorDict[name_ls[i]] = position_ls[i]
 
-  def getEndEffectorLinkID(self):
-      """ return the end effector link ID """
-      return self.linkNameToID[self.end_effector_name]
 
-  def getEndEffectorPosition(self):
-      """return the end effector position"""
-      link_states = p.getLinkState(self.model_unique_id, self.getEndEffectorLinkID())
-      return link_states[0]
 
 

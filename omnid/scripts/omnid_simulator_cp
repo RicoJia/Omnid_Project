@@ -1,0 +1,124 @@
+#!/usr/bin/env python3
+
+'''
+The Omnid simulator that connects bullet to ROS.
+Subscribes : /cmd_vel
+'''
+
+import rospy
+import pybullet as p
+import rospkg
+import numpy as np
+import pybullet_data
+from omnid_model import Omnid_Model
+import roslib
+from sensor_msgs.msg import JointState
+
+import actionlib
+
+from std_msgs.msg import Float64
+from trajectory_msgs.msg import JointTrajectory
+from control_msgs.msg import FollowJointTrajectoryAction
+from control_msgs.msg import FollowJointTrajectoryFeedback
+from control_msgs.msg import FollowJointTrajectoryResult
+
+
+roslib.load_manifest("omnid")
+
+class Omnid_Simulator:
+  def __init__(self, urdf_path):
+    self.joint_state_pub = rospy.Publisher('omnid/joint_states', JointState, queue_size=10)
+    use_spring = not(rospy.get_param("~test_without_spring", False))
+    test_with_end_effector_xyz = rospy.get_param("~test_with_end_effector_xyz")
+    after_spring_actuated = rospy.get_param("~after_spring_actuated")
+    urdf_name = rospy.get_param("~urdf_name")
+    self.omnid_model = Omnid_Model(urdfRootPath=urdf_path,
+                                   use_spring=use_spring,
+                                   test_with_end_effector_xyz=test_with_end_effector_xyz,
+                                   after_spring_actuated = after_spring_actuated,
+                                   urdf_name = urdf_name,
+                                   base_position = [1,1,0])
+
+
+    test_joint_control = rospy.get_param("~test_joint_control")
+    if test_joint_control:
+      self.joint_state_sub = rospy.Subscriber('joint_states_control', JointState, self.updateJointStates_CB)
+    else:
+      controller_namespace = rospy.get_param("~controller_namespace")
+      self.action_server = actionlib.SimpleActionServer(controller_namespace + '/follow_joint_trajectory',
+                                                            FollowJointTrajectoryAction,
+                                                            execute_cb=self.processFollowTrajectory,
+                                                            auto_start=False)
+      self.action_server.start()
+
+  def jointStatesPub(self):
+    self.joint_state_pub.publish(self.omnid_model.returnJointStateMsg())
+  def executeMotionCommands(self):
+    self.omnid_model.executeAllMotorPosCommands()
+  def updateJointStates_CB(self, msg):
+    """
+    API function for as a ROS Subscriber callback_function updating joint positions.
+    """
+    self.omnid_model.updateJointStates(msg.name, msg.position)
+
+  def processFollowTrajectory(self, goal):
+      """
+      Call back function for Moveit! trajectory following action request.
+      :param goal: the goal trajectory of actuated joints, i.e, phi angles.
+      """
+      success = True
+      traj = goal.trajectory
+      num_points = len(traj.points)
+      # figure out joint names and their positions
+      joint_names = traj.joint_names
+      #start from point 1, since the first point is the current starting point
+      for i in range(1, num_points):
+          #check for pre-emption
+          if self.action_server.is_preempt_requested():
+              rospy.loginfo("%Trajectory Action Preempted on Omnid" )
+              self.action_server.set_preempted()
+              success = False
+              break
+          #figure out the duration and joint positions of each trajectory segment
+          duration = (traj.points[i].time_from_start - traj.points[i-1].time_from_start ).to_sec()
+          joint_positions = traj.points[i].positions
+          #update the joints
+          self.omnid_model.updateJointStates(joint_names, joint_positions)
+          #realize each segment and time it
+          r = rospy.Rate(1.0/duration)
+          r.sleep()
+          #check if the action has been preempted
+
+      if success:
+          msg = 'Trajectory completed'
+          rospy.loginfo(msg)
+          res = FollowJointTrajectoryResult()
+          self.action_server.set_succeeded(result=res, text=msg)
+
+
+if __name__ == "__main__":
+    try:
+      rospy.init_node("omnid_node")
+      c = p.connect(p.SHARED_MEMORY)
+      if (c < 0):
+        c = p.connect(p.GUI)
+      p.setAdditionalSearchPath(pybullet_data.getDataPath())
+      p.resetSimulation()
+      p.loadURDF("plane.urdf" )  #loads from the root pybullet library
+      p.setGravity(0, 0, -10.0)
+      urdf_path = ((rospkg.RosPack()).get_path('omnid'))+'/urdf'
+      omnid_simulator = Omnid_Simulator(urdf_path)
+
+      p.setRealTimeSimulation(0)
+
+      # global joint_values
+      timeStep = 0.001
+      r = rospy.Rate(1.0/timeStep)
+      p.setTimeStep(timeStep)
+      while p.isConnected() and not rospy.is_shutdown():
+        omnid_simulator.executeMotionCommands()
+        omnid_simulator.jointStatesPub()
+        p.stepSimulation()
+        r.sleep()
+    except rospy.ROSInterruptException:
+        pass
