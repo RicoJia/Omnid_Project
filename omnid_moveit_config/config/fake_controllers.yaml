@@ -17,5 +17,5 @@ controller_list:
       - y
       - z
 initial:  # Define initial robot poses.
-  - group: end_effector
+  - group: end_effector_arm
     pose: home

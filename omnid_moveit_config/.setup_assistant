@@ -1,11 +1,11 @@
 moveit_setup_assistant_config:
   URDF:
     package: omnid
-    relative_path: urdf/delta_robot.urdf
+    relative_path: urdf/delta_robot_group_moveit.urdf.xacro
     xacro_args: ""
   SRDF:
     relative_path: config/delta-robot-RUU.srdf
   CONFIG:
     author_name: Rico Ruotong Jia
     author_email: ruotongjia2020@u.northwestern.edu
-    generated_timestamp: 1604030758
+    generated_timestamp: 1604852719

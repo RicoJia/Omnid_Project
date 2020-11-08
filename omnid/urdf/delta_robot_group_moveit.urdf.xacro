@@ -13,25 +13,32 @@ line program has not been written
 -->
 
   <!-- Radius of the base of the delta robot -->
+  <xacro:arg name="R_base" default ="0.18"/>
   <xacro:property name="R_base" value="$(arg R_base)" />
 
   <!-- height (i.e. thickness) of the base -->
+  <xacro:arg name="h_base" default ="0.009525"/>
   <xacro:property name="h_base" value="$(arg h_base)" />
 
   <!-- mass of the base -->
+  <xacro:arg name="M_base" default ="2.5"/>
   <xacro:property name="M_base" value="$(arg M_base)" />
 
 
   <!-- Radius of the platform (i.e. end-effector) of the delta robot -->
+  <xacro:arg name="R_platform" default ="0.062"/>
   <xacro:property name="R_platform" value="$(arg R_platform)" />
 
   <!-- height (i.e. thickness) of the platform -->
+  <xacro:arg name="h_platform" default ="0.01"/>
   <xacro:property name="h_platform" value="$(arg h_platform)" />
 
   <!-- Mass of the platform (i.e. end-effector) of the delta robot -->
+  <xacro:arg name="M_platform" default ="0.5"/>
   <xacro:property name="M_platform" value="$(arg M_platform)" />
 
   <!-- Length of the lower leg -->
+  <xacro:arg name="L_lower" default ="0.2"/>
   <xacro:property name="L_lower" value="$(arg L_lower)" />
 
   <!-- Mass of the lower leg -->
@@ -40,6 +47,7 @@ line program has not been written
   <!-- radius of lower leg cylinder -->
   <xacro:property name="R_lower" value=".009" />
 
+  <xacro:arg name="L_upper" default ="0.368"/>
   <xacro:property name="L_upper" value="$(arg L_upper)" />
 
   <!-- Mass of the upper leg -->
@@ -71,15 +79,16 @@ line program has not been written
 
   <!-- offset of the base joints above the base platform -->
   <!-- this offset is needed because the lower joints are above the base platform-->
+  <xacro:arg name="base_offset" default ="0.046375"/>
   <xacro:property name="base_offset" value="$(arg base_offset)" />
 
   <!-- Compute inertial properties for a cylinder, where the reference frame is centered.
        The axis of the cylinder
-  Parameters:
-  M - the mass,
-  R - the radius,
-  h - the height of the cylinder
-  axis - "z" to orient along z axis, x to orient along x axis
+       Parameters:
+        M - the mass,
+        R - the radius,
+        h - the height of the cylinder
+        axis - "z" to orient along z axis, x to orient along x axis
 -->
   <xacro:macro name="cylinder_inertia" params="M R h axis">
     <!--    <origin xyz="${0 if axis == 'z' else h/2.0} 0 ${h/2.0 if axis == 'z' else 0}" rpy="0 ${0 if axis == 'z' else -pi/2.0} 0" />-->
