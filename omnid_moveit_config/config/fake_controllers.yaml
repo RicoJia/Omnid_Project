@@ -1,21 +1,110 @@
 controller_list:
-  - name: fake_end_effector_controller
+  - name: fake_end_effector_1_controller
     joints:
-      - z
-  - name: fake_end_effector_arm_controller
+      []
+  - name: fake_end_effector_2_controller
     joints:
-      - theta_1
-      - beta_1
-      - gamma_1
-      - theta_2
-      - beta_2
-      - gamma_2
-      - theta_3
-      - beta_3
-      - gamma_3
-      - x
-      - y
-      - z
+      []
+  - name: fake_end_effector_3_controller
+    joints:
+      []
+  - name: fake_all_arms_controller
+    joints:
+      - object_platform/x
+      - object_platform/y
+      - object_platform/z
+      - object_platform/roll
+      - object_platform/pitch
+      - object_platform/yaw
+      - robot_1/theta_1
+      - robot_1/beta_1
+      - robot_1/gamma_1
+      - robot_1/theta_2
+      - robot_1/beta_2
+      - robot_1/gamma_2
+      - robot_1/theta_3
+      - robot_1/beta_3
+      - robot_1/gamma_3
+      - robot_1/x
+      - robot_1/y
+      - robot_1/z
+      - robot_2/theta_1
+      - robot_2/beta_1
+      - robot_2/gamma_1
+      - robot_2/theta_2
+      - robot_2/beta_2
+      - robot_2/gamma_2
+      - robot_2/theta_3
+      - robot_2/beta_3
+      - robot_2/gamma_3
+      - robot_2/x
+      - robot_2/y
+      - robot_2/z
+      - robot_3/theta_1
+      - robot_3/beta_1
+      - robot_3/gamma_1
+      - robot_3/theta_2
+      - robot_3/beta_2
+      - robot_3/gamma_2
+      - robot_3/theta_3
+      - robot_3/beta_3
+      - robot_3/gamma_3
+      - robot_3/x
+      - robot_3/y
+      - robot_3/z
+  - name: fake_end_effector_arm_1_controller
+    joints:
+      - robot_1/theta_1
+      - robot_1/beta_1
+      - robot_1/gamma_1
+      - robot_1/theta_2
+      - robot_1/beta_2
+      - robot_1/gamma_2
+      - robot_1/theta_3
+      - robot_1/beta_3
+      - robot_1/gamma_3
+      - robot_1/x
+      - robot_1/y
+      - robot_1/z
+  - name: fake_end_effector_arm_2_controller
+    joints:
+      - robot_2/theta_1
+      - robot_2/beta_1
+      - robot_2/gamma_1
+      - robot_2/theta_2
+      - robot_2/beta_2
+      - robot_2/gamma_2
+      - robot_2/theta_3
+      - robot_2/beta_3
+      - robot_2/gamma_3
+      - robot_2/x
+      - robot_2/y
+      - robot_2/z
+  - name: fake_end_effector_arm_3_controller
+    joints:
+      - robot_3/theta_1
+      - robot_3/beta_1
+      - robot_3/gamma_1
+      - robot_3/theta_2
+      - robot_3/beta_2
+      - robot_3/gamma_2
+      - robot_3/theta_3
+      - robot_3/beta_3
+      - robot_3/gamma_3
+      - robot_3/x
+      - robot_3/y
+      - robot_3/z
+  - name: fake_object_platform_eef_controller
+    joints:
+      []
+  - name: fake_object_platform_arm_controller
+    joints:
+      - object_platform/x
+      - object_platform/y
+      - object_platform/z
+      - object_platform/roll
+      - object_platform/pitch
+      - object_platform/yaw
 initial:  # Define initial robot poses.
-  - group: end_effector_arm
-    pose: home
+#  - group: end_effector_1
+#    pose: home

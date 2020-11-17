@@ -8,107 +8,347 @@ default_acceleration_scaling_factor: 0.1
 # Specific joint properties can be changed with the keys [max_position, min_position, max_velocity, max_acceleration]
 # Joint limits can be turned off with [has_velocity_limits, has_acceleration_limits]
 joint_limits:
-  beta_1:
-    has_velocity_limits: false
-    max_velocity: 0
-    has_acceleration_limits: false
-    max_acceleration: 0
-  beta_2:
-    has_velocity_limits: false
-    max_velocity: 0
-    has_acceleration_limits: false
-    max_acceleration: 0
-  beta_3:
-    has_velocity_limits: false
-    max_velocity: 0
-    has_acceleration_limits: false
-    max_acceleration: 0
-  gamma_1:
-    has_velocity_limits: false
-    max_velocity: 0
-    has_acceleration_limits: false
-    max_acceleration: 0
-  gamma_2:
-    has_velocity_limits: false
-    max_velocity: 0
-    has_acceleration_limits: false
-    max_acceleration: 0
-  gamma_3:
-    has_velocity_limits: false
-    max_velocity: 0
-    has_acceleration_limits: false
-    max_acceleration: 0
-  mimic_beta_1:
-    has_velocity_limits: false
-    max_velocity: 0
-    has_acceleration_limits: false
-    max_acceleration: 0
-  mimic_beta_2:
-    has_velocity_limits: false
-    max_velocity: 0
-    has_acceleration_limits: false
-    max_acceleration: 0
-  mimic_beta_3:
-    has_velocity_limits: false
-    max_velocity: 0
-    has_acceleration_limits: false
-    max_acceleration: 0
-  mimic_gamma_1:
-    has_velocity_limits: false
-    max_velocity: 0
-    has_acceleration_limits: false
-    max_acceleration: 0
-  mimic_gamma_2:
-    has_velocity_limits: false
-    max_velocity: 0
-    has_acceleration_limits: false
-    max_acceleration: 0
-  mimic_gamma_3:
-    has_velocity_limits: false
-    max_velocity: 0
-    has_acceleration_limits: false
-    max_acceleration: 0
-  mimic_theta_1:
+  object_platform/pitch:
     has_velocity_limits: true
     max_velocity: 100
     has_acceleration_limits: false
     max_acceleration: 0
-  mimic_theta_2:
+  object_platform/roll:
     has_velocity_limits: true
     max_velocity: 100
     has_acceleration_limits: false
     max_acceleration: 0
-  mimic_theta_3:
+  object_platform/x:
     has_velocity_limits: true
     max_velocity: 100
     has_acceleration_limits: false
     max_acceleration: 0
-  theta_1:
+  object_platform/y:
     has_velocity_limits: true
     max_velocity: 100
     has_acceleration_limits: false
     max_acceleration: 0
-  theta_2:
+  object_platform/yaw:
     has_velocity_limits: true
     max_velocity: 100
     has_acceleration_limits: false
     max_acceleration: 0
-  theta_3:
+  object_platform/z:
     has_velocity_limits: true
     max_velocity: 100
     has_acceleration_limits: false
     max_acceleration: 0
-  x:
+  robot_1/beta_1:
+    has_velocity_limits: false
+    max_velocity: 0
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_1/beta_2:
+    has_velocity_limits: false
+    max_velocity: 0
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_1/beta_3:
+    has_velocity_limits: false
+    max_velocity: 0
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_1/gamma_1:
+    has_velocity_limits: false
+    max_velocity: 0
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_1/gamma_2:
+    has_velocity_limits: false
+    max_velocity: 0
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_1/gamma_3:
+    has_velocity_limits: false
+    max_velocity: 0
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_1/mimic_beta_1:
+    has_velocity_limits: false
+    max_velocity: 0
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_1/mimic_beta_2:
+    has_velocity_limits: false
+    max_velocity: 0
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_1/mimic_beta_3:
+    has_velocity_limits: false
+    max_velocity: 0
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_1/mimic_gamma_1:
+    has_velocity_limits: false
+    max_velocity: 0
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_1/mimic_gamma_2:
+    has_velocity_limits: false
+    max_velocity: 0
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_1/mimic_gamma_3:
+    has_velocity_limits: false
+    max_velocity: 0
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_1/mimic_theta_1:
     has_velocity_limits: true
     max_velocity: 100
     has_acceleration_limits: false
     max_acceleration: 0
-  y:
+  robot_1/mimic_theta_2:
     has_velocity_limits: true
     max_velocity: 100
     has_acceleration_limits: false
     max_acceleration: 0
-  z:
+  robot_1/mimic_theta_3:
+    has_velocity_limits: true
+    max_velocity: 100
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_1/theta_1:
+    has_velocity_limits: true
+    max_velocity: 100
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_1/theta_2:
+    has_velocity_limits: true
+    max_velocity: 100
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_1/theta_3:
+    has_velocity_limits: true
+    max_velocity: 100
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_1/x:
+    has_velocity_limits: true
+    max_velocity: 100
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_1/y:
+    has_velocity_limits: true
+    max_velocity: 100
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_1/z:
+    has_velocity_limits: true
+    max_velocity: 100
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_2/beta_1:
+    has_velocity_limits: false
+    max_velocity: 0
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_2/beta_2:
+    has_velocity_limits: false
+    max_velocity: 0
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_2/beta_3:
+    has_velocity_limits: false
+    max_velocity: 0
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_2/gamma_1:
+    has_velocity_limits: false
+    max_velocity: 0
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_2/gamma_2:
+    has_velocity_limits: false
+    max_velocity: 0
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_2/gamma_3:
+    has_velocity_limits: false
+    max_velocity: 0
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_2/mimic_beta_1:
+    has_velocity_limits: false
+    max_velocity: 0
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_2/mimic_beta_2:
+    has_velocity_limits: false
+    max_velocity: 0
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_2/mimic_beta_3:
+    has_velocity_limits: false
+    max_velocity: 0
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_2/mimic_gamma_1:
+    has_velocity_limits: false
+    max_velocity: 0
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_2/mimic_gamma_2:
+    has_velocity_limits: false
+    max_velocity: 0
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_2/mimic_gamma_3:
+    has_velocity_limits: false
+    max_velocity: 0
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_2/mimic_theta_1:
+    has_velocity_limits: true
+    max_velocity: 100
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_2/mimic_theta_2:
+    has_velocity_limits: true
+    max_velocity: 100
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_2/mimic_theta_3:
+    has_velocity_limits: true
+    max_velocity: 100
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_2/theta_1:
+    has_velocity_limits: true
+    max_velocity: 100
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_2/theta_2:
+    has_velocity_limits: true
+    max_velocity: 100
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_2/theta_3:
+    has_velocity_limits: true
+    max_velocity: 100
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_2/x:
+    has_velocity_limits: true
+    max_velocity: 100
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_2/y:
+    has_velocity_limits: true
+    max_velocity: 100
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_2/z:
+    has_velocity_limits: true
+    max_velocity: 100
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_3/beta_1:
+    has_velocity_limits: false
+    max_velocity: 0
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_3/beta_2:
+    has_velocity_limits: false
+    max_velocity: 0
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_3/beta_3:
+    has_velocity_limits: false
+    max_velocity: 0
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_3/gamma_1:
+    has_velocity_limits: false
+    max_velocity: 0
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_3/gamma_2:
+    has_velocity_limits: false
+    max_velocity: 0
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_3/gamma_3:
+    has_velocity_limits: false
+    max_velocity: 0
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_3/mimic_beta_1:
+    has_velocity_limits: false
+    max_velocity: 0
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_3/mimic_beta_2:
+    has_velocity_limits: false
+    max_velocity: 0
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_3/mimic_beta_3:
+    has_velocity_limits: false
+    max_velocity: 0
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_3/mimic_gamma_1:
+    has_velocity_limits: false
+    max_velocity: 0
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_3/mimic_gamma_2:
+    has_velocity_limits: false
+    max_velocity: 0
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_3/mimic_gamma_3:
+    has_velocity_limits: false
+    max_velocity: 0
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_3/mimic_theta_1:
+    has_velocity_limits: true
+    max_velocity: 100
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_3/mimic_theta_2:
+    has_velocity_limits: true
+    max_velocity: 100
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_3/mimic_theta_3:
+    has_velocity_limits: true
+    max_velocity: 100
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_3/theta_1:
+    has_velocity_limits: true
+    max_velocity: 100
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_3/theta_2:
+    has_velocity_limits: true
+    max_velocity: 100
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_3/theta_3:
+    has_velocity_limits: true
+    max_velocity: 100
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_3/x:
+    has_velocity_limits: true
+    max_velocity: 100
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_3/y:
+    has_velocity_limits: true
+    max_velocity: 100
+    has_acceleration_limits: false
+    max_acceleration: 0
+  robot_3/z:
     has_velocity_limits: true
     max_velocity: 100
     has_acceleration_limits: false

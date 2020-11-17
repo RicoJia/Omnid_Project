@@ -5,8 +5,9 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /MotionPlanning1
+        - /MotionPlanning1/Planning Request1
       Splitter Ratio: 0.7425600290298462
-    Tree Height: 263
+    Tree Height: 435
   - Class: rviz/Help
     Name: Help
   - Class: rviz/Views
@@ -44,14 +45,14 @@ Visualization Manager:
       Enabled: true
       Move Group Namespace: ""
       MoveIt_Allow_Approximate_IK: false
-      MoveIt_Allow_External_Program: false
+      MoveIt_Allow_External_Program: true
       MoveIt_Allow_Replanning: false
       MoveIt_Allow_Sensor_Positioning: false
       MoveIt_Goal_Tolerance: 0
       MoveIt_Planning_Attempts: 10
       MoveIt_Planning_Time: 5
       MoveIt_Use_Cartesian_Path: false
-      MoveIt_Use_Constraint_Aware_IK: true
+      MoveIt_Use_Constraint_Aware_IK: false
       MoveIt_Warehouse_Host: 127.0.0.1
       MoveIt_Warehouse_Port: 33829
       MoveIt_Workspace:
@@ -73,149 +74,499 @@ Visualization Manager:
           Expand Link Details: false
           Expand Tree: false
           Link Tree Style: Links in Alphabetic Order
-          base_link:
+          object_platform_base:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          object_platform_end_effector:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          object_platform_pitch_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          object_platform_roll_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          object_platform_x_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          object_platform_y_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          object_platform_yaw_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          object_platform_z_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_1/base_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          extra_knee_link_1:
+          robot_1/dummy_platform_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          extra_knee_link_2:
+          robot_1/extra_knee_link_1:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          extra_knee_link_3:
+          robot_1/extra_knee_link_2:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          floating_world_1:
+          robot_1/extra_knee_link_3:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          floating_world_2:
+          robot_1/floating_world_0:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          floating_world_3:
+          robot_1/floating_world_1:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          knee_1:
+          robot_1/floating_world_2:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          knee_2:
+          robot_1/floating_world_3:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          knee_3:
+          robot_1/knee_1:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          lower_leg_1:
+          robot_1/knee_2:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-            Value: true
-          lower_leg_2:
+          robot_1/knee_3:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-            Value: true
-          lower_leg_3:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          lower_leg_attach_link_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          lower_leg_attach_link_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          lower_leg_attach_link_3:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          lower_leg_prespring_1:
+          robot_1/lower_leg_1:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          lower_leg_prespring_2:
+          robot_1/lower_leg_2:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          lower_leg_prespring_3:
+          robot_1/lower_leg_3:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          mimic_knee_link_1:
+          robot_1/lower_leg_attach_link_1:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          mimic_knee_link_2:
+          robot_1/lower_leg_attach_link_2:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          mimic_knee_link_3:
+          robot_1/lower_leg_attach_link_3:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          mimic_lower_leg_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          mimic_lower_leg_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          mimic_lower_leg_3:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          mimic_theta_link_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          mimic_theta_link_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          mimic_theta_link_3:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          platform_link:
+          robot_1/lower_leg_prespring_1:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          platform_x_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          platform_y_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          upper_leg_1:
+          robot_1/lower_leg_prespring_2:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          upper_leg_2:
+          robot_1/lower_leg_prespring_3:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          upper_leg_3:
+          robot_1/mimic_knee_link_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_1/mimic_knee_link_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_1/mimic_knee_link_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_1/mimic_lower_leg_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_1/mimic_lower_leg_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_1/mimic_lower_leg_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_1/mimic_theta_link_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_1/mimic_theta_link_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_1/mimic_theta_link_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_1/platform_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_1/platform_x_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_1/platform_y_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_1/upper_leg_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_1/upper_leg_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_1/upper_leg_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_2/base_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_2/dummy_platform_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/extra_knee_link_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/extra_knee_link_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/extra_knee_link_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/floating_world_0:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/floating_world_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/floating_world_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/floating_world_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/knee_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/knee_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/knee_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/lower_leg_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_2/lower_leg_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_2/lower_leg_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_2/lower_leg_attach_link_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/lower_leg_attach_link_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/lower_leg_attach_link_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/lower_leg_prespring_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_2/lower_leg_prespring_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_2/lower_leg_prespring_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_2/mimic_knee_link_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/mimic_knee_link_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/mimic_knee_link_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/mimic_lower_leg_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/mimic_lower_leg_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/mimic_lower_leg_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/mimic_theta_link_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/mimic_theta_link_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/mimic_theta_link_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/platform_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_2/platform_x_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/platform_y_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/upper_leg_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_2/upper_leg_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_2/upper_leg_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_3/base_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_3/dummy_platform_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/extra_knee_link_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/extra_knee_link_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/extra_knee_link_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/floating_world_0:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/floating_world_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/floating_world_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/floating_world_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/knee_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/knee_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/knee_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/lower_leg_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_3/lower_leg_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_3/lower_leg_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_3/lower_leg_attach_link_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/lower_leg_attach_link_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/lower_leg_attach_link_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/lower_leg_prespring_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_3/lower_leg_prespring_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_3/lower_leg_prespring_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_3/mimic_knee_link_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/mimic_knee_link_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/mimic_knee_link_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/mimic_lower_leg_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/mimic_lower_leg_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/mimic_lower_leg_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/mimic_theta_link_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/mimic_theta_link_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/mimic_theta_link_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/platform_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_3/platform_x_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/platform_y_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/upper_leg_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_3/upper_leg_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_3/upper_leg_3:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -224,7 +575,6 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-            Value: true
         Loop Animation: true
         Robot Alpha: 0.5
         Robot Color: 150; 50; 150
@@ -247,7 +597,7 @@ Visualization Manager:
         Goal State Color: 250; 128; 0
         Interactive Marker Size: 0
         Joint Violation Color: 255; 0; 255
-        Planning Group: end_effector_arm
+        Planning Group: all_arms
         Query Goal State: true
         Query Start State: false
         Show Workspace: false
@@ -270,149 +620,499 @@ Visualization Manager:
           Expand Link Details: false
           Expand Tree: false
           Link Tree Style: Links in Alphabetic Order
-          base_link:
+          object_platform_base:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          object_platform_end_effector:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          object_platform_pitch_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          object_platform_roll_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          object_platform_x_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          object_platform_y_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          object_platform_yaw_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          object_platform_z_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_1/base_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          extra_knee_link_1:
+          robot_1/dummy_platform_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          extra_knee_link_2:
+          robot_1/extra_knee_link_1:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          extra_knee_link_3:
+          robot_1/extra_knee_link_2:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          floating_world_1:
+          robot_1/extra_knee_link_3:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          floating_world_2:
+          robot_1/floating_world_0:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          floating_world_3:
+          robot_1/floating_world_1:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          knee_1:
+          robot_1/floating_world_2:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          knee_2:
+          robot_1/floating_world_3:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          knee_3:
+          robot_1/knee_1:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          lower_leg_1:
+          robot_1/knee_2:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-            Value: true
-          lower_leg_2:
+          robot_1/knee_3:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-            Value: true
-          lower_leg_3:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          lower_leg_attach_link_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          lower_leg_attach_link_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          lower_leg_attach_link_3:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          lower_leg_prespring_1:
+          robot_1/lower_leg_1:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          lower_leg_prespring_2:
+          robot_1/lower_leg_2:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          lower_leg_prespring_3:
+          robot_1/lower_leg_3:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          mimic_knee_link_1:
+          robot_1/lower_leg_attach_link_1:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          mimic_knee_link_2:
+          robot_1/lower_leg_attach_link_2:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          mimic_knee_link_3:
+          robot_1/lower_leg_attach_link_3:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          mimic_lower_leg_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          mimic_lower_leg_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          mimic_lower_leg_3:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          mimic_theta_link_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          mimic_theta_link_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          mimic_theta_link_3:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          platform_link:
+          robot_1/lower_leg_prespring_1:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          platform_x_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          platform_y_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          upper_leg_1:
+          robot_1/lower_leg_prespring_2:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          upper_leg_2:
+          robot_1/lower_leg_prespring_3:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          upper_leg_3:
+          robot_1/mimic_knee_link_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_1/mimic_knee_link_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_1/mimic_knee_link_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_1/mimic_lower_leg_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_1/mimic_lower_leg_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_1/mimic_lower_leg_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_1/mimic_theta_link_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_1/mimic_theta_link_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_1/mimic_theta_link_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_1/platform_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_1/platform_x_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_1/platform_y_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_1/upper_leg_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_1/upper_leg_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_1/upper_leg_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_2/base_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_2/dummy_platform_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/extra_knee_link_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/extra_knee_link_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/extra_knee_link_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/floating_world_0:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/floating_world_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/floating_world_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/floating_world_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/knee_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/knee_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/knee_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/lower_leg_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_2/lower_leg_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_2/lower_leg_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_2/lower_leg_attach_link_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/lower_leg_attach_link_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/lower_leg_attach_link_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/lower_leg_prespring_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_2/lower_leg_prespring_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_2/lower_leg_prespring_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_2/mimic_knee_link_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/mimic_knee_link_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/mimic_knee_link_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/mimic_lower_leg_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/mimic_lower_leg_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/mimic_lower_leg_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/mimic_theta_link_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/mimic_theta_link_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/mimic_theta_link_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/platform_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_2/platform_x_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/platform_y_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_2/upper_leg_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_2/upper_leg_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_2/upper_leg_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_3/base_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_3/dummy_platform_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/extra_knee_link_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/extra_knee_link_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/extra_knee_link_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/floating_world_0:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/floating_world_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/floating_world_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/floating_world_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/knee_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/knee_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/knee_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/lower_leg_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_3/lower_leg_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_3/lower_leg_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_3/lower_leg_attach_link_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/lower_leg_attach_link_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/lower_leg_attach_link_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/lower_leg_prespring_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_3/lower_leg_prespring_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_3/lower_leg_prespring_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_3/mimic_knee_link_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/mimic_knee_link_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/mimic_knee_link_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/mimic_lower_leg_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/mimic_lower_leg_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/mimic_lower_leg_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/mimic_theta_link_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/mimic_theta_link_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/mimic_theta_link_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/platform_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_3/platform_x_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/platform_y_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          robot_3/upper_leg_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_3/upper_leg_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          robot_3/upper_leg_3:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -421,12 +1121,37 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-            Value: true
         Robot Alpha: 0.5
         Show Robot Collision: false
         Show Robot Visual: true
       Value: true
       Velocity_Scaling_Factor: 0.1
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: moveit_visual_tools
+      Name: MarkerArray
+      Namespaces:
+        {}
+      Queue Size: 100
+      Value: true
+    - Attached Body Color: 150; 50; 150
+      Class: moveit_rviz_plugin/RobotState
+      Collision Enabled: false
+      Enabled: false
+      Links:
+        All Links Enabled: true
+        Expand Joint Details: false
+        Expand Link Details: false
+        Expand Tree: false
+        Link Tree Style: Links in Alphabetic Order
+      Name: RobotState
+      Robot Alpha: 1
+      Robot Description: robot_description
+      Robot State Topic: omnid_move_group_interface/display_robot_state
+      Show All Links: true
+      Show Highlights: true
+      Value: false
+      Visual Enabled: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -443,7 +1168,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/XYOrbit
-      Distance: 1.428671956062317
+      Distance: 2.795832633972168
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -451,33 +1176,33 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 0.2735591530799866
-        Y: -0.06452007591724396
-        Z: 2.831226311172941e-07
+        X: 0.3778061866760254
+        Y: -0.14958375692367554
+        Z: 8.195644340958097e-07
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.12979653477668762
+      Pitch: 0.17979717254638672
       Target Frame: world
-      Yaw: 0.011767158284783363
+      Yaw: 4.034932613372803
     Saved: ~
 Window Geometry:
   Displays:
-    collapsed: true
-  Height: 1025
+    collapsed: false
+  Height: 1052
   Help:
     collapsed: false
-  Hide Left Dock: true
+  Hide Left Dock: false
   Hide Right Dock: false
   MotionPlanning:
-    collapsed: true
+    collapsed: false
   MotionPlanning - Trajectory Slider:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd000000010000000000000315000003abfc0200000007fb000000100044006900730070006c006100790073000000003b00000196000000c700fffffffb0000000800480065006c00700000000342000000bb0000006e00fffffffb0000000a0056006900650077007300000003b0000000b0000000a000fffffffb0000000c00430061006d00650072006100000002ff000001610000000000000000fb0000001e004d006f00740069006f006e00200050006c0061006e006e0069006e00670100000374000001890000000000000000fb00000044004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000003f00fffffffb0000001c004d006f00740069006f006e0050006c0061006e006e0069006e006700000001d70000020f0000017300ffffff0000039f000003ab00000001000000020000000100000002fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd0000000100000000000002a2000003c6fc0200000007fb000000100044006900730070006c006100790073010000003b00000242000000c700fffffffb0000000800480065006c00700000000342000000bb0000006e00fffffffb0000000a0056006900650077007300000003b0000000b0000000a000fffffffb0000000c00430061006d00650072006100000002ff000001610000000000000000fb0000001e004d006f00740069006f006e00200050006c0061006e006e0069006e00670100000374000001890000000000000000fb00000044004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000003f00fffffffb0000001c004d006f00740069006f006e0050006c0061006e006e0069006e006701000002830000017e0000017200ffffff000004d8000003c600000001000000020000000100000002fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Views:
     collapsed: false
-  Width: 927
-  X: 993
-  Y: 27
+  Width: 1920
+  X: 0
+  Y: 0

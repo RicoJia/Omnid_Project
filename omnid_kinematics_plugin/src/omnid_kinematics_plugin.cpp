@@ -108,13 +108,6 @@ namespace omnid_kinematics{
         active_ = true;
         ROS_INFO_NAMED("omnid_kinematics_plugin","omnid_kinematics_plugin initialized");
 
-
-        //TODO
-        for(unsigned int i = 0; i < ik_chain_info_.joint_names.size(); ++i){
-            ROS_INFO_STREAM("joint_name: "<<  ik_chain_info_.joint_names.at(i));
-            ROS_INFO_STREAM("link_name: "<<  fk_chain_info_.link_names.at(i));
-        }
-
         return true;
     }
 

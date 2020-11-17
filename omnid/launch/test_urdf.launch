@@ -14,7 +14,7 @@
        L_upper:=0.368
        base_offset:=0.046375
        "/>
-    <arg name="urdf_serial" default="$(find xacro)/xacro --inorder $(find omnid)/urdf/delta_robot_moveit.urdf.xacro
+    <arg name="urdf_serial" default="$(find xacro)/xacro --inorder $(find omnid)/urdf/delta_robot_group_moveit.urdf.xacro
        R_base:=0.18
        h_base:=0.009525
        M_base:=2.5
