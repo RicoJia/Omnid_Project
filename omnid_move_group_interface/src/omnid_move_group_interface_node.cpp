@@ -37,6 +37,8 @@ using std::for_each;
 using std::vector;
 using geometry_msgs::Pose;
 
+typedef arma::Mat<double > mat;
+
 //TASK: try to drag the marker, see if it follows u.
 //Milestones:
 // 2. , iterate thru all robot: get inverse of reference->robot tf, tf -> eigen, Pose -> eigen
@@ -48,55 +50,26 @@ using geometry_msgs::Pose;
 
 namespace omnid_group_planning{
 
-    /// \brief interface for updating a single arm in Moveit!
-    class Single_Omnid_Planner{
-    public:
-        /// \brief: default constructor of an arm planning module
-        Single_Omnid_Planner();
+    //TODO
+    using std::cout;
+    using std::endl;
+    void printGeoTrans(const std::string name, const geometry_msgs::TransformStamped& t){
+        auto trans = t.transform;
+        cout<<name<<" Translation: "<<trans.translation.x<<" "<<trans.translation.y<<" "<<trans.translation.z<<endl;
+    }
 
-        /// \brief - constructor of an arm planning module
-        /// \param planning_group_name - name of the arm's planning group, which is a subgroup of a larger planning group in SRDF
-        /// \param nh - node handle
-        /// \param body_frame_name - name of the frame that we want to express our end_effector pose in.
-        /// \param reference_frame_name - name of the reference frame of the robot group. Usually this is the centroid of the planning robot group.
-        Single_Omnid_Planner(std::string planning_group_name, ros::NodeHandle nh, std::string body_frame_name,
-                         std::string reference_frame_name);
 
-        /// \brief publish the pose next pose for visualization in the robot's body frame.
-        void publish();
-
-        /// \brief Update the next pose for visualization in the refence frame of the planning group
-        void updateNextWorldPose(const geometry_msgs::Pose& pose);
-
-        /// \brief return TF from the group reference frame to the robot base frame.
-        geometry_msgs::TransformStamped getReftoRobotTF();
-
-    protected:
-        std::string eef_name_;  //tip of the link that's attached to the end_effector, for example "robot_3/dummy_platform_link"
-        std::string body_frame_name_;
-        ros::Publisher goal_state_pub_;
-        moveit::planning_interface::MoveGroupInterface move_group_;
-        geometry_msgs::PoseStamped eef_world_pose_stamped_;
-        geometry_msgs::TransformStamped reference_to_robot_tf_;
-    };
-
-    Single_Omnid_Planner::Single_Omnid_Planner() : move_group_(""){}
-
-    Single_Omnid_Planner::Single_Omnid_Planner(std::string planning_group_name, ros::NodeHandle nh, std::string body_frame_name,
-                                       std::string reference_frame_name):
-            move_group_(planning_group_name)
-    {
-        eef_name_ =  move_group_.getEndEffectorLink();
-        eef_world_pose_stamped_.header.frame_id = reference_frame_name;
-        goal_state_pub_ = nh.advertise<geometry_msgs::PoseStamped>("/rviz/moveit/move_marker/goal_" + eef_name_, 1);
-        body_frame_name_ = body_frame_name;
-
-        // Initialize TF /world -> /floating_world_0
+    /// \brief listen to tf2::Transform and return it. An exception will be returned if no tf is heard
+    /// \param target_frame: frame we express source frame in.
+    /// \param source_frame: frame we want to express in target_frame.
+    geometry_msgs::TransformStamped listenToTf2Transform(std::string target_frame, std::string source_frame){
         tf2_ros::Buffer tf_buffer;
         tf2_ros::TransformListener tf_listener (tf_buffer);
         try{
-            reference_to_robot_tf_ = tf_buffer.lookupTransform(body_frame_name_, reference_frame_name, ros::Time(0),
-                                                           ros::Duration(3.0));
+            //Tsource -> target
+            auto reference_to_robot_tf_ = tf_buffer.lookupTransform(target_frame, source_frame, ros::Time(0),
+                                                               ros::Duration(3.0));
+            return reference_to_robot_tf_;
         }
         catch(std::exception &e){
             ROS_ERROR_STREAM("omnid_move_group_interface: cannot initialize TF. " << e.what());
@@ -104,24 +77,57 @@ namespace omnid_group_planning{
         };
     }
 
-    void Single_Omnid_Planner::publish()
+
+    class Single_Omnid_Planner{
+    public:
+        /// \brief - constructor of an arm planning module
+        /// \param planning_group_name - name of the arm's planning group, which is a subgroup of a larger planning group in SRDF
+        /// \param nh - node handle
+        /// \param body_frame_name - name of the frame that we want to express our end_effector pose in.
+        /// \param reference_frame_name - name of the reference frame of the robot group. Usually this is the centroid of the planning robot group.
+        Single_Omnid_Planner(std::string planning_group_name, ros::NodeHandle nh, std::string body_frame_name, std::string group_reference_frame_name_, std::string world_frame_name);
+
+        /// \brief publish the pose next pose for visualization in the robot's body frame.
+        void publish();
+
+        /// \brief Update the next pose for visualization in the refence frame of the planning group
+        void updateNextPose(const geometry_msgs::Pose& pose);
+
+        /// \brief return TF from the group reference frame to the robot base frame.
+        geometry_msgs::TransformStamped getReftoRobotTF();
+
+    protected:
+        std::string eef_name_;  //tip of the link that's attached to the end_effector, for example "robot_3/dummy_platform_link"
+        ros::Publisher goal_state_pub_;
+        moveit::planning_interface::MoveGroupInterface move_group_;
+        geometry_msgs::PoseStamped eef_pose_stamped;
+        geometry_msgs::TransformStamped reference_to_robot_tf_;
+    };
+
+    Single_Omnid_Planner::Single_Omnid_Planner(std::string planning_group_name, ros::NodeHandle nh, std::string body_frame_name, std::string group_reference_frame_name_, std::string world_frame_name):
+            move_group_(planning_group_name)
     {
-        geometry_msgs::PoseStamped eef_pose_bodyframe_stamped_;
-        eef_pose_bodyframe_stamped_.header.frame_id = body_frame_name_;
-        tf2::doTransform(eef_world_pose_stamped_, eef_pose_bodyframe_stamped_, reference_to_robot_tf_);
-        ROS_INFO_STREAM("body pose header: "<<eef_pose_bodyframe_stamped_.header.frame_id<<" body_frame_name: "<<body_frame_name_);
-        goal_state_pub_.publish(eef_pose_bodyframe_stamped_);
+        eef_name_ =  move_group_.getEndEffectorLink();
+        eef_pose_stamped.header.frame_id = world_frame_name;
+        goal_state_pub_ = nh.advertise<geometry_msgs::PoseStamped>("/rviz/moveit/move_marker/goal_" + eef_name_, 1);
+        reference_to_robot_tf_ = listenToTf2Transform(group_reference_frame_name_, body_frame_name);
     }
 
-    void Single_Omnid_Planner::updateNextWorldPose(const geometry_msgs::Pose &pose)
+    void Single_Omnid_Planner::publish()
     {
-        eef_world_pose_stamped_.pose = pose;
+        goal_state_pub_.publish(eef_pose_stamped);
+    }
+
+    void Single_Omnid_Planner::updateNextPose(const geometry_msgs::Pose &pose)
+    {
+        eef_pose_stamped.pose = pose;
     }
 
     geometry_msgs::TransformStamped Single_Omnid_Planner::getReftoRobotTF()
     {
         return reference_to_robot_tf_;
     }
+
 
 
 
@@ -146,6 +152,8 @@ namespace omnid_group_planning{
         std::string object_platform_planning_group_name_;
         std::string eef_update_topic_name_;
         std::string eef_update_frame_name_;
+        geometry_msgs::TransformStamped ref_to_world_tf_;
+        tf2::Transform world_to_ref_tf_;
 
         /// \brief listen to interactive marker position updates in world frame, then we update each marker's next world pose.
         void subCB(const visualization_msgs::InteractiveMarkerUpdate::ConstPtr& msg);   //callback function for object_platform pose update
@@ -157,22 +165,28 @@ namespace omnid_group_planning{
         /// \param object_platform_world_pose - object platform pose in the world frame.
         /// \param next_robot_poses - vector to store updated robot poses for the next time step.
         /// \return true if a valid pose is found for each object platform, correspondingly next_robot_poses will be updated. False if not, and next_robot_poses will be empty
-        bool highLevelIK(const geometry_msgs::Pose& object_platform_world_pose, std::vector<geometry_msgs::Pose> next_robot_poses);
+        bool highLevelIK(const geometry_msgs::Pose& object_platform_world_pose, std::vector<geometry_msgs::Pose>& next_robot_poses);
     };
 
     Omnid_Group_Planner::Omnid_Group_Planner(ros::NodeHandle nh):
         object_platform_(nullptr)
     {
         initParams();
+        ref_to_world_tf_ = listenToTf2Transform(group_reference_frame_name_, world_frame_name_);    //To->w
+        auto world_to_ref_tf = listenToTf2Transform(world_frame_name_, group_reference_frame_name_);
+        tf2::fromMsg(world_to_ref_tf.transform, world_to_ref_tf_);
+        //TODO
+        printGeoTrans("reference -> world", ref_to_world_tf_);
+
         //Initialize arms.
         arms_.reserve(leg_num_);
         for (unsigned int i = 0; i < leg_num_; ++i){
             unsigned int robot_id = i + 1;
             const std::string planning_group_name = planning_group_prefix_ + std::to_string(robot_id);
             const std::string body_frame_name = body_frame_name_prefix_ + std::to_string(robot_id) + body_frame_name_suffix_;
-            arms_.push_back( make_unique<Single_Omnid_Planner>(planning_group_name, nh, body_frame_name, group_reference_frame_name_) );
+            arms_.push_back( make_unique<Single_Omnid_Planner>(planning_group_name, nh, body_frame_name, group_reference_frame_name_, world_frame_name_) );
         }
-        object_platform_ = make_unique<Single_Omnid_Planner>(object_platform_planning_group_name_, nh, group_reference_frame_name_, group_reference_frame_name_);    //we need the object_platform to have its own base frame as the world refence frame.
+        object_platform_ = make_unique<Single_Omnid_Planner>(object_platform_planning_group_name_, nh, group_reference_frame_name_, group_reference_frame_name_, world_frame_name_);    //we need the object_platform to have its own base frame as the world refence frame.
         eef_sub_ = nh.subscribe<visualization_msgs::InteractiveMarkerUpdate>(eef_update_topic_name_, 1,boost::bind(&omnid_group_planning::Omnid_Group_Planner::subCB, this,_1));
     };
 
@@ -182,7 +196,7 @@ namespace omnid_group_planning{
         leg_num_ = 3;
         world_frame_name_ = "world";
         body_frame_name_prefix_ = "robot_";
-        body_frame_name_suffix_ = "floating_world_0";
+        body_frame_name_suffix_ = "/floating_world_0";
         group_reference_frame_name_ = "object_platform_base";
         planning_group_prefix_ = "end_effector_arm_";
         object_platform_planning_group_name_ = "object_platform_arm";
@@ -193,16 +207,14 @@ namespace omnid_group_planning{
     void Omnid_Group_Planner::subCB(const visualization_msgs::InteractiveMarkerUpdate::ConstPtr &msg)
     {
         for(const auto& marker_pose: msg->poses){
-            ROS_INFO_STREAM("NAME: " << marker_pose.name);
             if (marker_pose.name == eef_update_frame_name_) {
                 // update next robot poses
                 vector<Pose> next_robot_poses(leg_num_);
                 if(highLevelIK(marker_pose.pose, next_robot_poses)){
                     for (unsigned id = 0; id < leg_num_; ++id) {
                         auto& arm = arms_.at(id);
-                        arm->updateNextWorldPose(next_robot_poses.at(id));
+                        arm->updateNextPose(next_robot_poses.at(id));
                         arm->publish();
-                        ROS_INFO_STREAM("POSE: " << marker_pose.pose.position.z);
                     }
                 }
             }
@@ -210,20 +222,33 @@ namespace omnid_group_planning{
     }
 
     bool Omnid_Group_Planner::highLevelIK(const geometry_msgs::Pose &object_platform_world_pose,
-                                          std::vector <Pose> next_robot_poses)
+                                          std::vector <Pose>& next_robot_poses)
     {
-        auto getInvTransfrom = [](const geometry_msgs::TransformStamped& t){
-            tf2::Stamped<tf2::Transform> tf;
-            tf2::convert(t, tf);
-            return tf.inverse();
-        };
+        tf2::Transform world_to_obj_tf;
+        tf2::fromMsg(object_platform_world_pose, world_to_obj_tf);
+        mat::fixed<4,4> world_to_obj_arma;
+        tf2::fromMsg(world_to_obj_tf, world_to_obj_arma);
 
         for(unsigned int id = 0; id < leg_num_; ++id){
-            auto robot_to_ref_tf = getInvTransfrom(arms_.at(id) -> getReftoRobotTF());
-            auto tf_armadillo = tf2::transformToArmadillo(robot_to_ref_tf);
+            auto ref_to_robot_tf = arms_.at(id) -> getReftoRobotTF();
+            mat::fixed<4,4> ref_to_robot_arma, ref_to_world_arma, ref_to_robot_eef_arma;
+            tf2::fromMsg(ref_to_robot_tf.transform, ref_to_robot_arma);
+            tf2::fromMsg(ref_to_world_tf_.transform, ref_to_world_arma);
+            // get next robot eef pose in the reference frame
+            bool success = omnid_group_ik::getRobotEefPose(world_to_obj_arma, ref_to_world_arma, ref_to_robot_arma,
+                                           ref_to_robot_eef_arma);
+            if (!success){
+                next_robot_poses.clear();
+                ROS_WARN_STREAM("omnid_move_group_interface: cannot find valid robot end effector poses given the object platform pose");
+                return false;
+            }
+            //update next_robot_poses: first in reference_frame, then publish in world frame.
+            tf2::Transform ref_to_robot_eef, world_to_robot_eef;
+            tf2::toMsg(ref_to_robot_eef_arma, ref_to_robot_eef);
+            world_to_robot_eef = world_to_ref_tf_ * ref_to_robot_eef; 
+            tf2::toMsg(world_to_robot_eef, next_robot_poses.at(id));
         }
-        //TODO
-        
+        return true;
     }
 
 }

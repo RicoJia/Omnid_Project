@@ -62,7 +62,7 @@ namespace tf2{
     /// \return SE(3) matrix for the transform
     inline void fromMsg (const Transform &msg, mat::fixed<4, 4>& out) {
         auto o = msg.getOrigin();
-        out = (xyzToTranslation(o.x(), o.y(), o.z())) * (matrix3x3ToRotation(tf.getBasis()));
+        out = (xyzToTranslation(o.x(), o.y(), o.z())) * (matrix3x3ToRotation(msg.getBasis()));
     }
 
     /// \brief Transform to Armadillo matrix for a geometry_msgs::Transform message
@@ -82,7 +82,10 @@ namespace tf2{
         Matrix3x3 R;
         R.setValue(T(0, 0), T(0, 1), T(0, 2), T(1, 0), T(1, 1), T(1, 2), T(2, 0), T(2, 1), T(2, 2));
         Vector3 p;
-        p.setValue(T(0,3),T(1,3),T(2,3));
+        p.setValue(T(0, 3), T(1, 3), T(2, 3));
+        //TODO
+        std::cout<<"R values: "<< T(0, 0)<<T(0, 1)<<T(0, 2)<<T(1, 0)<<T(1, 1)<<T(1, 2)<<T(2, 0)<<T(2, 1)<<T(2, 2)<<
+        " | P values: "<< T(0, 3)<<" "<<T(1, 3)<<" "<<T(2, 3)<<std::endl;
         TF.setBasis(R);
         TF.setOrigin(p);
         return TF;
@@ -92,7 +95,8 @@ namespace tf2{
     /// \param T - Transform
     /// \return Transform in geometry_msgs::Transform
     inline geometry_msgs::Transform toMsg(const mat::fixed<4, 4> T){
-        auto tf_tf2 = armadilloToTf2Transform(T);
+        Transform  tf_tf2;
+        tf_tf2 = toMsg(T, tf_tf2);
         geometry_msgs::Transform tf_geo = tf2::toMsg(tf_tf2);
         return tf_geo;
     }

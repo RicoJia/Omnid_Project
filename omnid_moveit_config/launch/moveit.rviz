@@ -6,6 +6,8 @@ Panels:
       Expanded:
         - /MotionPlanning1
         - /MotionPlanning1/Planning Request1
+        - /TF1
+        - /TF1/Frames1
       Splitter Ratio: 0.7425600290298462
     Tree Height: 435
   - Class: rviz/Help
@@ -1152,6 +1154,384 @@ Visualization Manager:
       Show Highlights: true
       Value: false
       Visual Enabled: true
+    - Class: rviz/TF
+      Enabled: true
+      Frame Timeout: 15
+      Frames:
+        All Enabled: false
+        object_platform_base:
+          Value: false
+        object_platform_end_effector:
+          Value: false
+        object_platform_pitch_link:
+          Value: false
+        object_platform_roll_link:
+          Value: false
+        object_platform_x_link:
+          Value: false
+        object_platform_y_link:
+          Value: false
+        object_platform_yaw_link:
+          Value: false
+        object_platform_z_link:
+          Value: false
+        robot_1/base_link:
+          Value: false
+        robot_1/dummy_platform_link:
+          Value: false
+        robot_1/extra_knee_link_1:
+          Value: false
+        robot_1/extra_knee_link_2:
+          Value: false
+        robot_1/extra_knee_link_3:
+          Value: false
+        robot_1/floating_world_0:
+          Value: false
+        robot_1/floating_world_1:
+          Value: false
+        robot_1/floating_world_2:
+          Value: false
+        robot_1/floating_world_3:
+          Value: false
+        robot_1/knee_1:
+          Value: false
+        robot_1/knee_2:
+          Value: false
+        robot_1/knee_3:
+          Value: false
+        robot_1/lower_leg_1:
+          Value: false
+        robot_1/lower_leg_2:
+          Value: false
+        robot_1/lower_leg_3:
+          Value: false
+        robot_1/lower_leg_attach_link_1:
+          Value: false
+        robot_1/lower_leg_attach_link_2:
+          Value: false
+        robot_1/lower_leg_attach_link_3:
+          Value: false
+        robot_1/lower_leg_prespring_1:
+          Value: false
+        robot_1/lower_leg_prespring_2:
+          Value: false
+        robot_1/lower_leg_prespring_3:
+          Value: false
+        robot_1/mimic_knee_link_1:
+          Value: false
+        robot_1/mimic_knee_link_2:
+          Value: false
+        robot_1/mimic_knee_link_3:
+          Value: false
+        robot_1/mimic_lower_leg_1:
+          Value: false
+        robot_1/mimic_lower_leg_2:
+          Value: false
+        robot_1/mimic_lower_leg_3:
+          Value: false
+        robot_1/mimic_theta_link_1:
+          Value: false
+        robot_1/mimic_theta_link_2:
+          Value: false
+        robot_1/mimic_theta_link_3:
+          Value: false
+        robot_1/platform_link:
+          Value: false
+        robot_1/platform_x_link:
+          Value: false
+        robot_1/platform_y_link:
+          Value: false
+        robot_1/upper_leg_1:
+          Value: false
+        robot_1/upper_leg_2:
+          Value: false
+        robot_1/upper_leg_3:
+          Value: false
+        robot_2/base_link:
+          Value: false
+        robot_2/dummy_platform_link:
+          Value: false
+        robot_2/extra_knee_link_1:
+          Value: false
+        robot_2/extra_knee_link_2:
+          Value: false
+        robot_2/extra_knee_link_3:
+          Value: false
+        robot_2/floating_world_0:
+          Value: false
+        robot_2/floating_world_1:
+          Value: false
+        robot_2/floating_world_2:
+          Value: false
+        robot_2/floating_world_3:
+          Value: false
+        robot_2/knee_1:
+          Value: false
+        robot_2/knee_2:
+          Value: false
+        robot_2/knee_3:
+          Value: false
+        robot_2/lower_leg_1:
+          Value: false
+        robot_2/lower_leg_2:
+          Value: false
+        robot_2/lower_leg_3:
+          Value: false
+        robot_2/lower_leg_attach_link_1:
+          Value: false
+        robot_2/lower_leg_attach_link_2:
+          Value: false
+        robot_2/lower_leg_attach_link_3:
+          Value: false
+        robot_2/lower_leg_prespring_1:
+          Value: false
+        robot_2/lower_leg_prespring_2:
+          Value: false
+        robot_2/lower_leg_prespring_3:
+          Value: false
+        robot_2/mimic_knee_link_1:
+          Value: false
+        robot_2/mimic_knee_link_2:
+          Value: false
+        robot_2/mimic_knee_link_3:
+          Value: false
+        robot_2/mimic_lower_leg_1:
+          Value: false
+        robot_2/mimic_lower_leg_2:
+          Value: false
+        robot_2/mimic_lower_leg_3:
+          Value: false
+        robot_2/mimic_theta_link_1:
+          Value: false
+        robot_2/mimic_theta_link_2:
+          Value: false
+        robot_2/mimic_theta_link_3:
+          Value: false
+        robot_2/platform_link:
+          Value: false
+        robot_2/platform_x_link:
+          Value: false
+        robot_2/platform_y_link:
+          Value: false
+        robot_2/upper_leg_1:
+          Value: false
+        robot_2/upper_leg_2:
+          Value: false
+        robot_2/upper_leg_3:
+          Value: false
+        robot_3/base_link:
+          Value: false
+        robot_3/dummy_platform_link:
+          Value: false
+        robot_3/extra_knee_link_1:
+          Value: false
+        robot_3/extra_knee_link_2:
+          Value: false
+        robot_3/extra_knee_link_3:
+          Value: false
+        robot_3/floating_world_0:
+          Value: false
+        robot_3/floating_world_1:
+          Value: false
+        robot_3/floating_world_2:
+          Value: false
+        robot_3/floating_world_3:
+          Value: false
+        robot_3/knee_1:
+          Value: false
+        robot_3/knee_2:
+          Value: false
+        robot_3/knee_3:
+          Value: false
+        robot_3/lower_leg_1:
+          Value: false
+        robot_3/lower_leg_2:
+          Value: false
+        robot_3/lower_leg_3:
+          Value: false
+        robot_3/lower_leg_attach_link_1:
+          Value: false
+        robot_3/lower_leg_attach_link_2:
+          Value: false
+        robot_3/lower_leg_attach_link_3:
+          Value: false
+        robot_3/lower_leg_prespring_1:
+          Value: false
+        robot_3/lower_leg_prespring_2:
+          Value: false
+        robot_3/lower_leg_prespring_3:
+          Value: false
+        robot_3/mimic_knee_link_1:
+          Value: false
+        robot_3/mimic_knee_link_2:
+          Value: false
+        robot_3/mimic_knee_link_3:
+          Value: false
+        robot_3/mimic_lower_leg_1:
+          Value: false
+        robot_3/mimic_lower_leg_2:
+          Value: false
+        robot_3/mimic_lower_leg_3:
+          Value: false
+        robot_3/mimic_theta_link_1:
+          Value: false
+        robot_3/mimic_theta_link_2:
+          Value: false
+        robot_3/mimic_theta_link_3:
+          Value: false
+        robot_3/platform_link:
+          Value: false
+        robot_3/platform_x_link:
+          Value: false
+        robot_3/platform_y_link:
+          Value: false
+        robot_3/upper_leg_1:
+          Value: false
+        robot_3/upper_leg_2:
+          Value: false
+        robot_3/upper_leg_3:
+          Value: false
+        world:
+          Value: false
+      Marker Alpha: 1
+      Marker Scale: 1
+      Name: TF
+      Show Arrows: true
+      Show Axes: true
+      Show Names: true
+      Tree:
+        world:
+          object_platform_base:
+            object_platform_x_link:
+              object_platform_y_link:
+                object_platform_z_link:
+                  object_platform_roll_link:
+                    object_platform_pitch_link:
+                      object_platform_yaw_link:
+                        object_platform_end_effector:
+                          {}
+          robot_1/base_link:
+            robot_1/floating_world_0:
+              robot_1/lower_leg_attach_link_1:
+                robot_1/lower_leg_1:
+                  robot_1/knee_1:
+                    robot_1/upper_leg_1:
+                      robot_1/mimic_knee_link_1:
+                        robot_1/extra_knee_link_1:
+                          robot_1/mimic_lower_leg_1:
+                            robot_1/mimic_theta_link_1:
+                              robot_1/floating_world_1:
+                                robot_1/lower_leg_attach_link_2:
+                                  robot_1/lower_leg_2:
+                                    robot_1/knee_2:
+                                      robot_1/upper_leg_2:
+                                        robot_1/mimic_knee_link_2:
+                                          robot_1/extra_knee_link_2:
+                                            robot_1/mimic_lower_leg_2:
+                                              robot_1/mimic_theta_link_2:
+                                                robot_1/floating_world_2:
+                                                  robot_1/lower_leg_attach_link_3:
+                                                    robot_1/lower_leg_3:
+                                                      robot_1/knee_3:
+                                                        robot_1/upper_leg_3:
+                                                          robot_1/mimic_knee_link_3:
+                                                            robot_1/extra_knee_link_3:
+                                                              robot_1/mimic_lower_leg_3:
+                                                                robot_1/mimic_theta_link_3:
+                                                                  robot_1/floating_world_3:
+                                                                    robot_1/platform_x_link:
+                                                                      robot_1/platform_y_link:
+                                                                        robot_1/dummy_platform_link:
+                                                                          robot_1/platform_link:
+                                                                            {}
+                                                    robot_1/lower_leg_prespring_3:
+                                                      {}
+                                  robot_1/lower_leg_prespring_2:
+                                    {}
+                robot_1/lower_leg_prespring_1:
+                  {}
+          robot_2/base_link:
+            robot_2/floating_world_0:
+              robot_2/lower_leg_attach_link_1:
+                robot_2/lower_leg_1:
+                  robot_2/knee_1:
+                    robot_2/upper_leg_1:
+                      robot_2/mimic_knee_link_1:
+                        robot_2/extra_knee_link_1:
+                          robot_2/mimic_lower_leg_1:
+                            robot_2/mimic_theta_link_1:
+                              robot_2/floating_world_1:
+                                robot_2/lower_leg_attach_link_2:
+                                  robot_2/lower_leg_2:
+                                    robot_2/knee_2:
+                                      robot_2/upper_leg_2:
+                                        robot_2/mimic_knee_link_2:
+                                          robot_2/extra_knee_link_2:
+                                            robot_2/mimic_lower_leg_2:
+                                              robot_2/mimic_theta_link_2:
+                                                robot_2/floating_world_2:
+                                                  robot_2/lower_leg_attach_link_3:
+                                                    robot_2/lower_leg_3:
+                                                      robot_2/knee_3:
+                                                        robot_2/upper_leg_3:
+                                                          robot_2/mimic_knee_link_3:
+                                                            robot_2/extra_knee_link_3:
+                                                              robot_2/mimic_lower_leg_3:
+                                                                robot_2/mimic_theta_link_3:
+                                                                  robot_2/floating_world_3:
+                                                                    robot_2/platform_x_link:
+                                                                      robot_2/platform_y_link:
+                                                                        robot_2/dummy_platform_link:
+                                                                          robot_2/platform_link:
+                                                                            {}
+                                                    robot_2/lower_leg_prespring_3:
+                                                      {}
+                                  robot_2/lower_leg_prespring_2:
+                                    {}
+                robot_2/lower_leg_prespring_1:
+                  {}
+          robot_3/base_link:
+            robot_3/floating_world_0:
+              robot_3/lower_leg_attach_link_1:
+                robot_3/lower_leg_1:
+                  robot_3/knee_1:
+                    robot_3/upper_leg_1:
+                      robot_3/mimic_knee_link_1:
+                        robot_3/extra_knee_link_1:
+                          robot_3/mimic_lower_leg_1:
+                            robot_3/mimic_theta_link_1:
+                              robot_3/floating_world_1:
+                                robot_3/lower_leg_attach_link_2:
+                                  robot_3/lower_leg_2:
+                                    robot_3/knee_2:
+                                      robot_3/upper_leg_2:
+                                        robot_3/mimic_knee_link_2:
+                                          robot_3/extra_knee_link_2:
+                                            robot_3/mimic_lower_leg_2:
+                                              robot_3/mimic_theta_link_2:
+                                                robot_3/floating_world_2:
+                                                  robot_3/lower_leg_attach_link_3:
+                                                    robot_3/lower_leg_3:
+                                                      robot_3/knee_3:
+                                                        robot_3/upper_leg_3:
+                                                          robot_3/mimic_knee_link_3:
+                                                            robot_3/extra_knee_link_3:
+                                                              robot_3/mimic_lower_leg_3:
+                                                                robot_3/mimic_theta_link_3:
+                                                                  robot_3/floating_world_3:
+                                                                    robot_3/platform_x_link:
+                                                                      robot_3/platform_y_link:
+                                                                        robot_3/dummy_platform_link:
+                                                                          robot_3/platform_link:
+                                                                            {}
+                                                    robot_3/lower_leg_prespring_3:
+                                                      {}
+                                  robot_3/lower_leg_prespring_2:
+                                    {}
+                robot_3/lower_leg_prespring_1:
+                  {}
+      Update Interval: 0
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -1168,7 +1548,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/XYOrbit
-      Distance: 2.795832633972168
+      Distance: 1.4480139017105103
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -1184,9 +1564,9 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.17979717254638672
+      Pitch: 0.6697978377342224
       Target Frame: world
-      Yaw: 4.034932613372803
+      Yaw: 4.399923324584961
     Saved: ~
 Window Geometry:
   Displays:
