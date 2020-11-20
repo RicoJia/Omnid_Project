@@ -4,6 +4,7 @@
 
 #ifndef OMNID_PROJECT_OMNID_GROUP_IK_HPP
 #define OMNID_PROJECT_OMNID_GROUP_IK_HPP
+#define ARMA_DONT_USE_WRAPPER
 
 #include <armadillo>
 
@@ -11,20 +12,32 @@ typedef arma::Mat<double> mat;
 
 namespace omnid_group_ik{
 
-    /// \brief High Level IK that update each robot's end effector pose in group_reference_frame for a given object platfor pose in a reference frame
+    /// \brief High Level IK that update each robot's body frame end effector pose for a given object platfor pose in a reference frame
     /// \param in_pose - object platform pose in the world frame
-    /// \param ref_to_robot - transform from the reference frame to the robot frame.
+    /// \param robot_to_world - transform from the robot body frame to the world frame.
+    /// \param ref_to_robot = transform from the reference frame to robot
     /// \param out_pose - robot end effector pose (in the reference frame) to be updated.
-    /// \return true if a valid pose is found for the robot. False if not.
-
-    bool getRobotEefPose(const mat::fixed<4,4>& in_pose, const mat::fixed<4,4>& ref_to_world, const mat::fixed<4,4>& ref_to_robot, mat::fixed<4,4>& out_pose ){
-
-        out_pose = (ref_to_world * in_pose);
-        out_pose = out_pose * ref_to_robot;;
-        //TODO add collision check
-
-        return true;
+    //TODO: take out the inverse
+    void getRobotEefPose(const mat::fixed<4, 4> &in_pose, const mat::fixed<4, 4> &robot_to_world,
+                         const mat::fixed<4, 4> &ref_to_world, const mat::fixed<4, 4> &robot_to_world_inv, mat::fixed<4, 4> &out_pose) {
+        // T_eff_ref = T_robot_world * T_in * T_ref_world * T_world_robot
+        out_pose = (robot_to_world * in_pose);
+        out_pose = out_pose * ref_to_world;
+//        mat world_to_robot = arma::inv(robot_to_world);
+        out_pose = out_pose * robot_to_world_inv;
     }
+/*
+    void getRobotEefPose(const mat& in_pose, const mat &robot_to_world,
+                         const mat& ref_to_world, mat &out_pose) {
+        // T_eff_ref = T_robot_world * T_in * T_ref_world * T_world_robot
+        out_pose = (robot_to_world * in_pose);
+        out_pose = out_pose * ref_to_world;
+        mat world_to_robot = arma::inv(robot_to_world);
+        out_pose = out_pose * world_to_robot;
+    }
+*/
+
+
 }
 
 #endif //OMNID_PROJECT_OMNID_GROUP_IK_HPP

@@ -12,45 +12,44 @@ find_package(catkin REQUIRED COMPONENTS
         visualization_msgs
         tf2_armadillo
         )
-
-find_package (Eigen3 REQUIRED)
+find_package(Armadillo REQUIRED)
 
 catkin_package(
 #  INCLUDE_DIRS include
   LIBRARIES ${PROJECT_NAME}
 #  CATKIN_DEPENDS roscpp
-  DEPENDS system_lib Eigen3
+#  DEPENDS system_lib Eigen3
 )
 
 include_directories(
  include
   ${catkin_INCLUDE_DIRS}
+  ${ARMADILLO_INCLUDE_DIRS}
+        ${BLAS_INCLUDE_DIRS}
+        ${LAPACK_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
- add_library(${PROJECT_NAME}
-   src/omnid_group_ik.cpp
- )
- target_link_libraries(
-        ${PROJECT_NAME}
-        ${catkin_LIBRARIES}
- )
+## Armadillo Runtime Library
+#set(ARMA_LIBS ${ARMA_LIBS} ${MKL_LIBRARIES})
+set(ARMA_LIBS ${ARMA_LIBS} ${BLAS_LIBRARIES})
+set(ARMA_LIBS ${ARMA_LIBS} ${LAPACK_LIBRARIES})
+
+ if(ARMA_USE_ATLAS STREQUAL true)
+  set(ARMA_LIBS ${ARMA_LIBS} ${CBLAS_LIBRARIES})
+  set(ARMA_LIBS ${ARMA_LIBS} ${CLAPACK_LIBRARIES})
+ endif()
 
  add_executable(${PROJECT_NAME}_node src/omnid_move_group_interface_node.cpp)
 
  target_link_libraries(${PROJECT_NAME}_node
          ${catkin_LIBRARIES}
          ${Boost_LIBRARIES}
+         ${ARMA_LIBS}
  )
 
  install(TARGETS ${PROJECT_NAME}_node
    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
- )
-
- install(TARGETS ${PROJECT_NAME}
-   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-   RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
  )
 
 # Mark cpp header files for installation

@@ -15,15 +15,8 @@
   <build_export_depend>tf2</build_export_depend>
   <exec_depend>roscpp</exec_depend>
   <exec_depend>tf2</exec_depend>
-  <depend>Armadillo</depend>
   <depend>geometry_msgs</depend>
   <test_depend>rosunit</test_depend>
 
 
-
-  <!-- The export tag contains other, unspecified, tags -->
-  <export>
-    <!-- Other tools can request additional information be placed here -->
-
-  </export>
 </package>

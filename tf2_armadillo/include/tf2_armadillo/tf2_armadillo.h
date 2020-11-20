@@ -83,12 +83,21 @@ namespace tf2{
         R.setValue(T(0, 0), T(0, 1), T(0, 2), T(1, 0), T(1, 1), T(1, 2), T(2, 0), T(2, 1), T(2, 2));
         Vector3 p;
         p.setValue(T(0, 3), T(1, 3), T(2, 3));
-        //TODO
-        std::cout<<"R values: "<< T(0, 0)<<T(0, 1)<<T(0, 2)<<T(1, 0)<<T(1, 1)<<T(1, 2)<<T(2, 0)<<T(2, 1)<<T(2, 2)<<
-        " | P values: "<< T(0, 3)<<" "<<T(1, 3)<<" "<<T(2, 3)<<std::endl;
+
         TF.setBasis(R);
         TF.setOrigin(p);
         return TF;
+    }
+
+    /// \brief convert armadillo matrix to pose
+    /// \param T - Transform
+    /// \param pose - pose message to be outputed
+    /// \return - the same pose message as in the parameters
+    inline geometry_msgs::Pose toMsg (const mat::fixed<4, 4> T, geometry_msgs::Pose& pose){
+        Transform TF;
+        toMsg(T, TF);
+        toMsg(TF, pose);
+        return pose;
     }
 
     /// \brief Armadillo Matrix to geometry_msgs::Transform
