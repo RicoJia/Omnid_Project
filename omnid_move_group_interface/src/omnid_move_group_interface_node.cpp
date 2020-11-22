@@ -95,10 +95,13 @@ namespace omnid_group_planning{
         void publish();
 
         /// \brief Update the next pose for visualization
-        /// \param pose - body_frame pose
-        void updateNextPose(const geometry_msgs::Pose& pose);
+        /// \param pose - body_frame or world frame pose. The pose will be in world frame after this step.
+        /// \param  isWorldPose - if the pose is already in world frame, it will be directly stored.
+        /// Else, the pose will be transformed into the world frame.
+        void updateNextPose(const geometry_msgs::Pose& pose, bool isWorldPose = false);
 
         /// \brief return TF from the group reference frame to the robot base frame.
+        /// \return Robot to World TF
         geometry_msgs::TransformStamped getRobotToWorldTF();
 
         /// \brief checks if a pose (in body frame) can be achieved by calling IK
@@ -106,26 +109,24 @@ namespace omnid_group_planning{
         /// \return true if there is a valid combination of actuated joint values for achieving this pose. Else, false.
         bool isValidPose(const geometry_msgs::Pose& pose);
 
-    protected:
+    private:
         std::string eef_name_;  //tip of the link that's attached to the end_effector, for example "robot_3/dummy_platform_link"
         ros::Publisher goal_state_pub_;
         moveit::planning_interface::MoveGroupInterface move_group_;
-        const kinematics::KinematicsBaseConstPtr& solver_ptr_;
         geometry_msgs::PoseStamped eef_pose_stamped;
         geometry_msgs::TransformStamped robot_to_world_tf_; //T_robot_world
         geometry_msgs::TransformStamped world_to_robot_tf_;
     };
 
     Single_Omnid_Planner::Single_Omnid_Planner(std::string planning_group_name, ros::NodeHandle nh, std::string body_frame_name, std::string world_frame_name):
-            move_group_(planning_group_name),
-            solver_ptr_ (move_group_.getRobotModel () -> getJointModelGroup(planning_group_name) -> getSolverInstance())
+            move_group_(planning_group_name)
     {
         eef_name_ =  move_group_.getEndEffectorLink();
         eef_pose_stamped.header.frame_id = world_frame_name;
+        eef_pose_stamped.pose.orientation.w = 1;
         goal_state_pub_ = nh.advertise<geometry_msgs::PoseStamped>("/rviz/moveit/move_marker/goal_" + eef_name_, 1);
         robot_to_world_tf_ = listenToTf2Transform(body_frame_name, world_frame_name);
         world_to_robot_tf_ = listenToTf2Transform(world_frame_name, body_frame_name);
-
     }
 
     void Single_Omnid_Planner::publish()
@@ -133,9 +134,14 @@ namespace omnid_group_planning{
         goal_state_pub_.publish(eef_pose_stamped);
     }
 
-    void Single_Omnid_Planner::updateNextPose(const geometry_msgs::Pose &pose)
+    void Single_Omnid_Planner::updateNextPose(const geometry_msgs::Pose &pose, bool isWorldPose)
     {
-        tf2::doTransform(pose, eef_pose_stamped.pose, world_to_robot_tf_);  //in world frame
+        if (!isWorldPose){
+            tf2::doTransform(pose, eef_pose_stamped.pose, world_to_robot_tf_);  //in world frame
+        }
+        else{
+            eef_pose_stamped.pose = pose;
+        }
     }
 
     geometry_msgs::TransformStamped Single_Omnid_Planner::getRobotToWorldTF()
@@ -144,27 +150,26 @@ namespace omnid_group_planning{
     }
 
     bool Single_Omnid_Planner::isValidPose(const geometry_msgs::Pose &pose) {
-
         auto joint_model_group = move_group_.getRobotModel()->getJointModelGroup(move_group_.getName());
         double dimension_ =
                 joint_model_group->getActiveJointModels().size() + joint_model_group->getMimicJointModels().size();
 
-        std::vector<double> seed{dimension_};
-        //TODO - what is consistency_limits
-        std::vector<double> consistency_limits{dimension_};
+        std::vector<double> seed(dimension_);
         std::vector<double> ik_sol;
         ik_sol.reserve(dimension_);
         moveit_msgs::MoveItErrorCodes error;
-
         kinematics::KinematicsQueryOptions options;
-        ROS_FATAL_STREAM("1");
-        bool success = solver_ptr_->searchPositionIK(pose, seed, 0.01, ik_sol, error, options);
-        ROS_FATAL_STREAM("success "<<success);
-
-        return success;
+        auto solver_ptr = joint_model_group -> getSolverInstance();
+        if (solver_ptr){
+            bool success = solver_ptr->searchPositionIK(pose, seed, 0.01, ik_sol, error, options);
+            if(!success) ROS_WARN_STREAM("We're getting outside of the workspace");
+            return success;
+        }
+        else{
+            ROS_ERROR_STREAM("IK solver for individual robots is not available");
+            return false;
+        }
     }
-//    const Pose&, std::vector<double>&, double, std::vector<double>&, moveit_msgs::MoveItErrorCodes (&)(), kinematics::KinematicsQueryOptions (&)()
-//    const Pose&, const std::vector<double>&, double, std::vector<double>&, moveit_msgs::MoveItErrorCodes&, const kinematics::KinematicsQueryOptions&
 
 
     /// \brief Interface for updating a group of omnid robots.
@@ -207,14 +212,12 @@ namespace omnid_group_planning{
         object_platform_(nullptr)
     {
         initParams();
-
         //Initialize arms.
         arms_.reserve(leg_num_);
         for (unsigned int i = 0; i < leg_num_; ++i){
             unsigned int robot_id = i + 1;
             const std::string planning_group_name = planning_group_prefix_ + std::to_string(robot_id);
             const std::string body_frame_name = body_frame_name_prefix_ + std::to_string(robot_id) + body_frame_name_suffix_;
-
             arms_.push_back( make_unique<Single_Omnid_Planner>(planning_group_name, nh, body_frame_name, world_frame_name_) );
         }
         object_platform_ = make_unique<Single_Omnid_Planner>(object_platform_planning_group_name_, nh, group_reference_frame_name_, world_frame_name_);
@@ -237,19 +240,20 @@ namespace omnid_group_planning{
 
     void Omnid_Group_Planner::subCB(const visualization_msgs::InteractiveMarkerUpdate::ConstPtr &msg)
     {
-
+        //Calculate the high level IK, then publish each arm's position if a valid set of joint positions can be found
         for(const auto& marker_pose: msg->poses){
             if (marker_pose.name == eef_update_frame_name_) {
-                // update next robot poses in their own body frames
                 vector<Pose> next_robot_poses(leg_num_);
-
                 if(highLevelIK(marker_pose.pose, next_robot_poses, arms_)){
+                    object_platform_->updateNextPose(marker_pose.pose, true);     //we update the marker pose if it's good
                     for (unsigned id = 0; id < leg_num_; ++id) {
                         auto& arm = arms_.at(id);
                         arm->updateNextPose(next_robot_poses.at(id));
-
                         arm->publish();
                     }
+                }
+                else{
+                    object_platform_->publish();
                 }
             }
         }
@@ -287,8 +291,8 @@ namespace omnid_group_planning{
             // get next robot eef pose in the reference frame
             omnid_group_ik::getRobotEefPose(world_to_obj_arma, robot_to_world_arma, ref_to_world_arma, robot_to_world_inv_arma, robot_to_eef_arma);
 
+            //TODO add to tf2_armadillo: toMsg(const mat::fixed<4, 4> T, geometry_msgs::Pose&)
             //check the validity of the pose
-            //            TODO add to tf2_armadillo: toMsg(const mat::fixed<4, 4> T, geometry_msgs::Pose&)
             Pose robot_to_eef_pose;
             tf2::toMsg(robot_to_eef_arma, robot_to_eef_pose);
 

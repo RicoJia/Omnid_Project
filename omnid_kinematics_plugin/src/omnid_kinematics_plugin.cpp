@@ -137,9 +137,9 @@ namespace omnid_kinematics{
                                               moveit_msgs::MoveItErrorCodes &error_code,
                                               const kinematics::KinematicsQueryOptions &options) const
     {
+
         const IKCallbackFn solution_callback = 0;
         std::vector<double> consistency_limits;
-
         return searchPositionIK(ik_pose,
                                 ik_seed_state,
                                 timeout,

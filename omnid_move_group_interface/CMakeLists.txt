@@ -29,16 +29,9 @@ include_directories(
         ${LAPACK_INCLUDE_DIRS}
 )
 
-## Declare a C++ library
-## Armadillo Runtime Library
-#set(ARMA_LIBS ${ARMA_LIBS} ${MKL_LIBRARIES})
-set(ARMA_LIBS ${ARMA_LIBS} ${BLAS_LIBRARIES})
-set(ARMA_LIBS ${ARMA_LIBS} ${LAPACK_LIBRARIES})
-
- if(ARMA_USE_ATLAS STREQUAL true)
-  set(ARMA_LIBS ${ARMA_LIBS} ${CBLAS_LIBRARIES})
-  set(ARMA_LIBS ${ARMA_LIBS} ${CLAPACK_LIBRARIES})
- endif()
+ ## Declare a C++ library
+ add_library(armadillo INTERFACE IMPORTED)
+ set_property(TARGET armadillo PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${ARMADILLO_INCLUDE_DIRS})
 
  add_executable(${PROJECT_NAME}_node src/omnid_move_group_interface_node.cpp)
 
