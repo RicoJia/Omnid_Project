@@ -5,11 +5,14 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /MotionPlanning1
+        - /MotionPlanning1/Scene Robot1
         - /MotionPlanning1/Planning Request1
+        - /MotionPlanning1/Planned Path1
+        - /MarkerArray1
         - /TF1
         - /TF1/Frames1
       Splitter Ratio: 0.7425600290298462
-    Tree Height: 435
+    Tree Height: 339
   - Class: rviz/Help
     Name: Help
   - Class: rviz/Views
@@ -84,6 +87,7 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
+            Value: true
           object_platform_pitch_link:
             Alpha: 1
             Show Axes: false
@@ -597,7 +601,7 @@ Visualization Manager:
         Colliding Link Color: 255; 0; 0
         Goal State Alpha: 1
         Goal State Color: 250; 128; 0
-        Interactive Marker Size: 0
+        Interactive Marker Size: 0.30000001192092896
         Joint Violation Color: 255; 0; 255
         Planning Group: all_arms
         Query Goal State: true
@@ -630,6 +634,7 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
+            Value: true
           object_platform_pitch_link:
             Alpha: 1
             Show Axes: false
@@ -1125,7 +1130,7 @@ Visualization Manager:
             Show Trail: false
         Robot Alpha: 0.5
         Show Robot Collision: false
-        Show Robot Visual: true
+        Show Robot Visual: false
       Value: true
       Velocity_Scaling_Factor: 0.1
     - Class: rviz/MarkerArray
@@ -1405,9 +1410,9 @@ Visualization Manager:
             object_platform_x_link:
               object_platform_y_link:
                 object_platform_z_link:
-                  object_platform_roll_link:
+                  object_platform_yaw_link:
                     object_platform_pitch_link:
-                      object_platform_yaw_link:
+                      object_platform_roll_link:
                         object_platform_end_effector:
                           {}
           robot_1/base_link:
@@ -1548,7 +1553,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/XYOrbit
-      Distance: 1.4480139017105103
+      Distance: 2.063516855239868
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -1564,14 +1569,14 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.6697978377342224
+      Pitch: 0.049797121435403824
       Target Frame: world
-      Yaw: 4.399923324584961
+      Yaw: 3.709904193878174
     Saved: ~
 Window Geometry:
   Displays:
     collapsed: false
-  Height: 1052
+  Height: 1025
   Help:
     collapsed: false
   Hide Left Dock: false
@@ -1580,9 +1585,9 @@ Window Geometry:
     collapsed: false
   MotionPlanning - Trajectory Slider:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd0000000100000000000002a2000003c6fc0200000007fb000000100044006900730070006c006100790073010000003b00000242000000c700fffffffb0000000800480065006c00700000000342000000bb0000006e00fffffffb0000000a0056006900650077007300000003b0000000b0000000a000fffffffb0000000c00430061006d00650072006100000002ff000001610000000000000000fb0000001e004d006f00740069006f006e00200050006c0061006e006e0069006e00670100000374000001890000000000000000fb00000044004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000003f00fffffffb0000001c004d006f00740069006f006e0050006c0061006e006e0069006e006701000002830000017e0000017200ffffff000004d8000003c600000001000000020000000100000002fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd0000000100000000000002a2000003abfc0200000007fb000000100044006900730070006c006100790073010000003b000001e2000000c700fffffffb0000000800480065006c00700000000342000000bb0000006e00fffffffb0000000a0056006900650077007300000003b0000000b0000000a000fffffffb0000000c00430061006d00650072006100000002ff000001610000000000000000fb0000001e004d006f00740069006f006e00200050006c0061006e006e0069006e00670100000374000001890000000000000000fb00000044004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d0020005400720061006a006500630074006f0072007900200053006c006900640065007201000002230000003f0000003f00fffffffb0000001c004d006f00740069006f006e0050006c0061006e006e0069006e006701000002680000017e0000017300ffffff00000495000003ab00000001000000020000000100000002fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Views:
     collapsed: false
-  Width: 1920
-  X: 0
-  Y: 0
+  Width: 1853
+  X: 67
+  Y: 27

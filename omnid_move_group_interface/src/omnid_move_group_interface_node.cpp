@@ -9,7 +9,7 @@
 ///     moveit_commander example https://www.theconstructsim.com/ros-qa-138-how-to-set-a-sequence-of-goals-in-moveit-for-a-manipulator/
 
 //Our own library
-#include "omnid_move_group_interface/omnid_group_ik.hpp"
+#include "omnid_move_group_interface/omnid_move_group_interface.hpp"
 
 //Moveit!
 #include <moveit/move_group_interface/move_group_interface.h>
@@ -47,7 +47,6 @@ typedef arma::Mat<double > mat;
 // 4. pose -> eigen, transformStamped -> eigen
 // 5. add eigen, so you can do multiplication.
 // 6. eigen -> pose.
-//TODO: fix the publisher of the object platform
 
 namespace omnid_group_planning{
 
@@ -72,15 +71,14 @@ namespace omnid_group_planning{
         try{
             //Tsource -> target
             auto reference_to_robot_tf_ = tf_buffer.lookupTransform(target_frame, source_frame, ros::Time(0),
-                                                               ros::Duration(3.0));
+                                                                    ros::Duration(3.0));
             return reference_to_robot_tf_;
         }
         catch(std::exception &e){
             ROS_ERROR_STREAM("omnid_move_group_interface: cannot initialize TF. " << e.what());
-            exit(1);    //TODO Not sure?
+            ros::shutdown();
         };
     }
-
 
     class Single_Omnid_Planner{
     public:
@@ -171,13 +169,15 @@ namespace omnid_group_planning{
         }
     }
 
-
-    /// \brief Interface for updating a group of omnid robots.
+/// \brief Interface for updating a group of omnid robots.
     class Omnid_Group_Planner{
     public:
         Omnid_Group_Planner(ros::NodeHandle nh);
-    protected:
+
+    private:
+        ros::NodeHandle nh_;
         unsigned int leg_num_;  //number of legs, we are going to number our legs starting from 1.
+        double delta_robot_base_offset_; //This is a hack. we are publishing the world frame pose, but rviz will recognize that as base_frame.
         std::vector<std::unique_ptr<Single_Omnid_Planner>> arms_;
         std::unique_ptr<Single_Omnid_Planner> object_platform_;
         ros::Subscriber eef_sub_;
@@ -191,12 +191,14 @@ namespace omnid_group_planning{
         // Here each robot's planning group name is planning_group_prefix + ID
         std::string planning_group_prefix_;
         std::string object_platform_planning_group_name_;
+        std::string object_platform_eef_name_;
         std::string eef_update_topic_name_;
         std::string eef_update_frame_name_;
+        bool object_platform_pose_init_;
 
         /// \brief listen to interactive marker position updates in world frame, then we update each marker's next world pose.
         void subCB(const visualization_msgs::InteractiveMarkerUpdate::ConstPtr& msg);   //callback function for object_platform pose update
-    private:
+
         /// \brief initialize frame names
         void initParams();
 
@@ -209,57 +211,82 @@ namespace omnid_group_planning{
     };
 
     Omnid_Group_Planner::Omnid_Group_Planner(ros::NodeHandle nh):
-        object_platform_(nullptr)
+            nh_(nh),
+            object_platform_(nullptr),
+            object_platform_pose_init_(false)
+
     {
+        //Workflow:
+        //  - initialize params
+        //  - initialize object platform and its pose
+        //  - initialize each delta robot (called "arm") (pose is not initialized here as it will be done in callback)
+        //  - initialize a cylinder
+
         initParams();
-        //Initialize arms.
+        object_platform_ = make_unique<Single_Omnid_Planner>(object_platform_planning_group_name_, nh_,
+                                                             group_reference_frame_name_, world_frame_name_);
+        eef_sub_ = nh_.subscribe<visualization_msgs::InteractiveMarkerUpdate>(eef_update_topic_name_, 1, boost::bind(
+                &omnid_group_planning::Omnid_Group_Planner::subCB, this, _1));
         arms_.reserve(leg_num_);
         for (unsigned int i = 0; i < leg_num_; ++i){
             unsigned int robot_id = i + 1;
             const std::string planning_group_name = planning_group_prefix_ + std::to_string(robot_id);
             const std::string body_frame_name = body_frame_name_prefix_ + std::to_string(robot_id) + body_frame_name_suffix_;
-            arms_.push_back( make_unique<Single_Omnid_Planner>(planning_group_name, nh, body_frame_name, world_frame_name_) );
+            arms_.push_back( make_unique<Single_Omnid_Planner>(planning_group_name, nh_, body_frame_name, world_frame_name_) );
         }
-        object_platform_ = make_unique<Single_Omnid_Planner>(object_platform_planning_group_name_, nh, group_reference_frame_name_, world_frame_name_);
-        eef_sub_ = nh.subscribe<visualization_msgs::InteractiveMarkerUpdate>(eef_update_topic_name_, 1,boost::bind(&omnid_group_planning::Omnid_Group_Planner::subCB, this,_1));
     };
 
     void Omnid_Group_Planner::initParams()
     {
         //TODO - Make these yaml params
         leg_num_ = 3;
+        delta_robot_base_offset_ = 0.046375;
         world_frame_name_ = "world";
         body_frame_name_prefix_ = "robot_";
         body_frame_name_suffix_ = "/floating_world_0";
         group_reference_frame_name_ = "object_platform_base";
         planning_group_prefix_ = "end_effector_arm_";
         object_platform_planning_group_name_ = "object_platform_arm";
+        //TODO
+        object_platform_eef_name_ = "object_platform_roll_link";
         eef_update_topic_name_ = "/rviz_moveit_motion_planning_display/robot_interaction_interactive_marker_topic/update";
-        eef_update_frame_name_ = "EE:goal_object_platform_yaw_link";
+        eef_update_frame_name_ = "EE:goal_object_platform_roll_link";
+        //TODO: omnid param
+
     }
 
     void Omnid_Group_Planner::subCB(const visualization_msgs::InteractiveMarkerUpdate::ConstPtr &msg)
     {
-        //Calculate the high level IK, then publish each arm's position if a valid set of joint positions can be found
+        //Workflow:
+        //  - Extract Object Platform's Marker Pose if valid.
+        //  - publish Marker pose if robots have found the first set of valid poses but the current poses are not valid
+        //  - Calculate the high level IK, update each robot with the new pose, then publish it if valid
+        //  - publish cylinder object no matter what happens. 
         for(const auto& marker_pose: msg->poses){
             if (marker_pose.name == eef_update_frame_name_) {
                 vector<Pose> next_robot_poses(leg_num_);
-                if(highLevelIK(marker_pose.pose, next_robot_poses, arms_)){
-                    object_platform_->updateNextPose(marker_pose.pose, true);     //we update the marker pose if it's good
+                auto object_platform_eef_pose = marker_pose.pose;
+                if(highLevelIK(object_platform_eef_pose, next_robot_poses, arms_)){
+                    object_platform_->updateNextPose(object_platform_eef_pose, true);     //we update the marker pose if it's good
                     for (unsigned id = 0; id < leg_num_; ++id) {
                         auto& arm = arms_.at(id);
                         arm->updateNextPose(next_robot_poses.at(id));
-                        arm->publish();
                     }
+                    object_platform_pose_init_ = true;  //we have found at least one valid set of poses.
                 }
                 else{
-                    object_platform_->publish();
+                    if (object_platform_pose_init_)
+                        object_platform_->publish();
+                }
+                for (unsigned id = 0; id < leg_num_; ++id) {
+                    auto& arm = arms_.at(id);
+                    arm->publish();
                 }
             }
         }
     }
 
-
+    /// \brief The high level IK calculates the pose of each robot for a given object platorm pose.
     bool Omnid_Group_Planner::highLevelIK(const geometry_msgs::Pose &object_platform_world_pose,
                                           std::vector<Pose>& next_robot_poses,
                                           const std::vector<std::unique_ptr<Single_Omnid_Planner>>& robot_ptrs)
@@ -299,20 +326,17 @@ namespace omnid_group_planning{
             const auto& robot_ptr = robot_ptrs.at(id);
 
             if (!robot_ptr -> isValidPose(robot_to_eef_pose)){
-
                 next_robot_poses.clear();
-                ROS_WARN_STREAM("omnid_move_group_interface: cannot find valid robot end effector poses given the object platform pose");
+//                ROS_WARN_STREAM("omnid_move_group_interface: cannot find valid robot end effector poses given the object platform pose");
                 return false;
             }
-
-            // update next_robot_pose in the robot's body frame
+            // update next_robot_pose in the robot's body frame (we need to subtract z by base_offset for Rviz visualization)
+            robot_to_eef_pose.position.z -= delta_robot_base_offset_;
             next_robot_poses.at(id) = robot_to_eef_pose;
         }
         return true;
     }
-
 }
-
 
 
 int main(int argc, char** argv)

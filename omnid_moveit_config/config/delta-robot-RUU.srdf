@@ -37,15 +37,43 @@
         <link name="object_platform_end_effector"/>
     </group>
     <group name="object_platform_arm">
-        <chain base_link="object_platform_base" tip_link="object_platform_yaw_link"/>
+        <chain base_link="object_platform_base" tip_link="object_platform_roll_link"/>
     </group>
     <!--END EFFECTOR: Purpose: Represent information about an end effector.-->
     <end_effector name="end_effector_1" parent_link="robot_1/dummy_platform_link" group="end_effector_1" parent_group="end_effector_arm_1"/>
     <end_effector name="end_effector_2" parent_link="robot_2/dummy_platform_link" group="end_effector_2" parent_group="end_effector_arm_2"/>
     <end_effector name="end_effector_3" parent_link="robot_3/dummy_platform_link" group="end_effector_3" parent_group="end_effector_arm_3"/>
-    <end_effector name="object_platform_eef" parent_link="object_platform_yaw_link" group="object_platform_eef" parent_group="object_platform_arm"/>
+    <end_effector name="object_platform_eef" parent_link="object_platform_roll_link" group="object_platform_eef" parent_group="object_platform_arm"/>
     <!--VIRTUAL JOINT: Purpose: this element defines a virtual joint between a robot link and an external frame of reference (considered fixed with respect to the robot)-->
     <virtual_joint name="FixedBase" type="fixed" parent_frame="world" child_link="world"/>
+    <!--PASSIVE JOINT: Purpose: this element is used to mark joints that are not actuated-->
+    <passive_joint name="robot_1/mimic_gamma_1"/>
+    <passive_joint name="robot_1/mimic_beta_1"/>
+    <passive_joint name="robot_1/mimic_theta_1"/>
+    <passive_joint name="robot_1/mimic_gamma_2"/>
+    <passive_joint name="robot_1/mimic_beta_2"/>
+    <passive_joint name="robot_1/mimic_theta_2"/>
+    <passive_joint name="robot_1/mimic_gamma_3"/>
+    <passive_joint name="robot_1/mimic_beta_3"/>
+    <passive_joint name="robot_1/mimic_theta_3"/>
+    <passive_joint name="robot_2/mimic_gamma_1"/>
+    <passive_joint name="robot_2/mimic_beta_1"/>
+    <passive_joint name="robot_2/mimic_theta_1"/>
+    <passive_joint name="robot_2/mimic_gamma_2"/>
+    <passive_joint name="robot_2/mimic_beta_2"/>
+    <passive_joint name="robot_2/mimic_theta_2"/>
+    <passive_joint name="robot_2/mimic_gamma_3"/>
+    <passive_joint name="robot_2/mimic_beta_3"/>
+    <passive_joint name="robot_2/mimic_theta_3"/>
+    <passive_joint name="robot_3/mimic_gamma_1"/>
+    <passive_joint name="robot_3/mimic_beta_1"/>
+    <passive_joint name="robot_3/mimic_theta_1"/>
+    <passive_joint name="robot_3/mimic_gamma_2"/>
+    <passive_joint name="robot_3/mimic_beta_2"/>
+    <passive_joint name="robot_3/mimic_theta_2"/>
+    <passive_joint name="robot_3/mimic_gamma_3"/>
+    <passive_joint name="robot_3/mimic_beta_3"/>
+    <passive_joint name="robot_3/mimic_theta_3"/>
     <!--DISABLE COLLISIONS: By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. This tag disables collision checking between a specified pair of links. -->
     <disable_collisions link1="robot_1/base_link" link2="robot_1/lower_leg_1" reason="Adjacent"/>
     <disable_collisions link1="robot_1/base_link" link2="robot_1/lower_leg_2" reason="Never"/>

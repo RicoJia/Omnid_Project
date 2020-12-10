@@ -5,8 +5,8 @@
 #include <moveit/rdf_loader/rdf_loader.h>
 #include "omnid_core/delta_robot.h"
 #include <cmath>
-#include <omnid_kinematics_plugin/omnid_kinematics_plugin.h>
-#include <../include/omnid_kinematics_plugin/omnid_kinematics_plugin.h>
+#include "omnid_kinematics_plugin/omnid_kinematics_plugin.h"
+//#include "../include/omnid_kinematics_plugin/omnid_kinematics_plugin.h"
 
 CLASS_LOADER_REGISTER_CLASS(omnid_kinematics::OmnidKinematicsPlugin, kinematics::KinematicsBase)
 
@@ -14,12 +14,14 @@ namespace omnid_kinematics{
 
     OmnidKinematicsPlugin::OmnidKinematicsPlugin():active_(false){}
 
-
+    /// \brief Initialize joint names and limits. Planning scene has an array for the end-effector-joint -names (as long as they're revolute, needs to be checked).
+    // Here, joint name checking looks for hard-coded keywords theta, beta.
     bool OmnidKinematicsPlugin::initialize(const std::string &robot_description,
                                         const std::string& group_name,
                                         const std::string& base_frame,
                                         const std::string& tip_frame,
                                         double search_discretization){
+
         // Set the parameters for the solver, for use with kinematic chain IK solvers
         setValues(robot_description, group_name, base_frame, tip_frame, search_discretization);
         //Load SRDF
@@ -37,11 +39,9 @@ namespace omnid_kinematics{
         if (!joint_model_group)
             return false;
 
-        // Here we skip chain checking because we work with a parallel manipulator. All we need is the three after-spring joint names
-        // We also skips single DOF joint checking, since we only care about the after spring joints
-
+        // We skip the single DOF joint checking, since we only care about the after spring joints
         // store joint names, joint limits, and the tip info into the IK & FK Chains
-        //TODO
+        //TODO - YAML
         std::string theta_name = "theta";
         std::string gamma_name = "gamma";
         std::string beta_name = "beta";
@@ -104,7 +104,6 @@ namespace omnid_kinematics{
         // Setup the joint state groups that we need
         state_.reset(new robot_state::RobotState(robot_model_));
         state_2_.reset(new robot_state::RobotState(robot_model_));
-
         active_ = true;
         ROS_INFO_NAMED("omnid_kinematics_plugin","omnid_kinematics_plugin initialized");
 
@@ -197,8 +196,10 @@ namespace omnid_kinematics{
                                               const IKCallbackFn &solution_callback,
                                               moveit_msgs::MoveItErrorCodes &error_code,
                                               const kinematics::KinematicsQueryOptions &options) const
-    {// Actual working function
+    {
+        // Actual working function
         // starting timing for time_out, then check for active, dimension, consistency limits
+
         if(!active_) {
             ROS_ERROR_NAMED("omnid_kinematics_plugin","kinematics not active");
             error_code.val = error_code.NO_IK_SOLUTION;
@@ -237,14 +238,14 @@ namespace omnid_kinematics{
         for (unsigned int i = 0; i < actuated_joint_names_.size(); ++i) {
             const std::string joint_name = actuated_joint_names_.at(i);
             if (std::isnan(thetas_vec.at(i))) {
-                ROS_WARN_STREAM(joint_name<<" hitting singularity. cannot plan. ");
+//                ROS_WARN_STREAM(joint_name<<" hitting singularity. cannot plan. ");
                 error_code.val = error_code.NO_IK_SOLUTION;
                 return false;
             }
             int joint_index = getJointIndex(joint_name);
             // apply joint limits here
             if(joint_min_.at(joint_index) > thetas_vec.at(i) || joint_max_.at(joint_index) < thetas_vec.at(i)){
-                ROS_WARN_STREAM(joint_name << " is hitting joint limits");
+//                ROS_WARN_STREAM(joint_name << " is hitting joint limits");
                 error_code.val = error_code.NO_IK_SOLUTION;
                 return false;
             }
@@ -314,8 +315,6 @@ namespace omnid_kinematics{
         end_effector_pose.position.y = xyz_pose.y;
         end_effector_pose.position.z = xyz_pose.z;
         poses.push_back(end_effector_pose);
-        //TODO
-        ROS_INFO_NAMED("omnid_kinematics_plugin","HEHEHE FK");
         return true;
     }
 

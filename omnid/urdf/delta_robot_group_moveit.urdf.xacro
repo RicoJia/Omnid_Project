@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="delta-robot-RUU">
 
+
   <!--  IMPORTANT NOTE: This URDF is for Moveit! use only, as it contains redundant joint to "serialize" the Delta Arm-->
 
   <!-- These parameters are stored in parameters.h and are passed in
@@ -105,6 +106,12 @@ line program has not been written
   <xacro:property name="object_platform_base_y" value="${(robot_1_base_y + robot_2_base_y + robot_3_base_y)/3.0}"/>
   <xacro:property name="object_platform_base_z" value="${(robot_1_base_z + robot_2_base_z + robot_3_base_z)/3.0}"/>
 
+<!--TODO: organize your yaml params -->
+  <xacro:property name="yaml_file" value="$(find omnid)/params/params.yaml"/>
+  <xacro:property name="yaml_params" value="${load_yaml(yaml_file)}"/>
+  <xacro:property name="object_clearance" value="${yaml_params['object_clearance']}"/>
+  <xacro:property name="object_thickness" value="${yaml_params['object_thickness']}"/>
+  <xacro:property name="object_inscribed_radius" value="${yaml_params['object_inscribed_radius']}"/>
 
 
   <!-- Compute inertial properties for a cylinder, where the reference frame is centered.
@@ -383,7 +390,7 @@ line program has not been written
       <child link="robot_${prefix}/dummy_platform_link" />
       <axis xyz="0 0 1" />
       <!-- Limits are required but currently arbitrary -->
-      <limit lower="${-base_offset}" upper="${vert_limit}" effort="100" velocity="100"/>
+      <limit lower="0" upper="${vert_limit}" effort="100" velocity="100"/>
       <dynamics damping="0.0" friction="0.0"/>
     </joint>
 <!--    define a dummy link for visualization-->
@@ -412,10 +419,14 @@ line program has not been written
     <xacro:end_effector tail_id="3" prefix="${prefix}"/>
   </xacro:macro>
 
+<!--
+  NOTE: PLEASE DO NOT CHANGE THIS SECTION, AS OMNID_PLANNING_ADAPTER_PLUGIN
+  DEPENDS DIRECTLY ON CONFIGURATIONS HERE
+-->
   <xacro:macro name="object_platform">
     <joint name="object_platform/fixed" type="fixed">
       <parent link="world"/>
-      <origin xyz="${object_platform_base_x} ${object_platform_base_y} ${object_platform_base_z-base_offset}"/>
+      <origin xyz="${object_platform_base_x} ${object_platform_base_y} ${object_platform_base_z + object_clearance + object_thickness/2.0}"/>
       <child link="object_platform_base"/>
     </joint>
     <link name="object_platform_base"/>
@@ -443,27 +454,9 @@ line program has not been written
       <dynamics damping="0.0" friction="0.0"/>
     </joint>
     <link name="object_platform_z_link"/>
-
-    <joint name="object_platform/roll" type="revolute" >
-      <parent link="object_platform_z_link" />
-      <child link="object_platform_roll_link" />
-      <origin xyz="0 0 0" rpy="0 0 0" />
-      <axis xyz="1 0 0" rpy="0 0 0"/>
-      <limit lower="${-pi/2.0}" upper="${pi/2.0}" effort="100" velocity="100" />
-      <dynamics damping="0.0" friction="0.0"/>
-    </joint>
-    <link name="object_platform_roll_link"/>
-    <joint name="object_platform/pitch" type="revolute" >
-      <parent link="object_platform_roll_link" />
-      <child link="object_platform_pitch_link" />
-      <origin xyz="0 0 0" rpy="0 0 0" />
-      <axis xyz="0 1 0" rpy="0 0 0"/>
-      <limit lower="${-pi/2.0}" upper="${pi/2.0}" effort="100" velocity="100" />
-      <dynamics damping="0.0" friction="0.0"/>
-    </joint>
-    <link name="object_platform_pitch_link"/>
+    <!--  we are following the ROS yaw-pitch-row convention-->
     <joint name="object_platform/yaw" type="revolute" >
-      <parent link="object_platform_pitch_link" />
+      <parent link="object_platform_z_link" />
       <child link="object_platform_yaw_link" />
       <origin xyz="0 0 0" rpy="0 0 0" />
       <axis xyz="0 0 1" rpy="0 0 0"/>
@@ -472,12 +465,39 @@ line program has not been written
     </joint>
     <link name="object_platform_yaw_link"/>
 
+    <joint name="object_platform/pitch" type="revolute" >
+      <parent link="object_platform_yaw_link" />
+      <child link="object_platform_pitch_link" />
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <axis xyz="0 1 0" rpy="0 0 0"/>
+      <limit lower="${-pi/2.0}" upper="${pi/2.0}" effort="100" velocity="100" />
+      <dynamics damping="0.0" friction="0.0"/>
+    </joint>
+    <link name="object_platform_pitch_link"/>
+
+    <joint name="object_platform/roll" type="revolute" >
+      <parent link="object_platform_pitch_link" />
+      <child link="object_platform_roll_link" />
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <axis xyz="1 0 0" rpy="0 0 0"/>
+      <limit lower="${-pi/2.0}" upper="${pi/2.0}" effort="100" velocity="100" />
+      <dynamics damping="0.0" friction="0.0"/>
+    </joint>
+    <link name="object_platform_roll_link"/>
+
     <joint name="object_platform_eef" type="fixed">
-      <parent link="object_platform_yaw_link"/>
+      <parent link="object_platform_roll_link"/>
       <origin xyz="0 0 0"/>
       <child link="object_platform_end_effector"/>
     </joint>
-    <link name="object_platform_end_effector"/>
+<!--    <link name="object_platform_end_effector"/>-->
+<!--    TODO-->
+    <xacro:cylinder_link name="object_platform_end_effector"
+                         M="${M_platform}"
+                         R="${object_inscribed_radius}"
+                         h="${object_thickness}"
+                         axis="z"
+                         mat="dark_pink" />
 
   </xacro:macro>
 

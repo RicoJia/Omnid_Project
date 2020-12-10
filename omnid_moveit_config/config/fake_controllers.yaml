@@ -106,5 +106,5 @@ controller_list:
       - object_platform/pitch
       - object_platform/yaw
 initial:  # Define initial robot poses.
-#  - group: end_effector_1
-#    pose: home
+  - group: fake_end_effector_arm_3_controller
+    pose: home

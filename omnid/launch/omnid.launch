@@ -1,11 +1,16 @@
 <launch>
     <arg name="test_spring" default="false" doc="test spring only"/>
-<!--    <node pkg="omnid" type="omnid_simulator" name="omnid_simulator" output="screen" unless="$(arg test_spring)" required="true">-->
-<!--        <rosparam command="load" file="$(find omnid)/params/params.yaml" />-->
-<!--    </node>-->
-    <node pkg="omnid" type="spring_test_simulator" name="spring_test_simulator" output="screen" if="$(arg test_spring)" required="true"/>
+    <rosparam command="load" file="$(find omnid)/params/params.yaml" />
 
-    <include file="$(find omnid)/launch/moveit_omnid.launch" unless="$(arg test_spring)"/>
-    <node pkg="omnid_move_group_interface" name="omnid_move_group_interface_node" type="omnid_move_group_interface_node" output="screen" unless="$(arg test_spring)"/>
+    <group if="$(arg test_spring)">
+        <node pkg="omnid" type="spring_test_simulator" name="spring_test_simulator" output="screen" required="true"/>
+    </group>
+
+    <group unless="$(arg test_spring)">
+        <node pkg="omnid" type="omnid_simulator" name="omnid_simulator" output="screen" required="true"/>
+<!--        <include file="$(find omnid)/launch/moveit_omnid.launch"/>-->
+<!--        <node pkg="omnid_move_group_interface" name="omnid_move_group_interface_node" type="omnid_move_group_interface_node" output="screen"/>-->
+    </group>
+
 </launch>
 

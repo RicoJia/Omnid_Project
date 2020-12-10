@@ -31,14 +31,23 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
+/* Author: Rico Ruotong Jia*/
 
-/* Author: Ioan Sucan, Rico Ruotong Jia*/
-//TODO declare dependence on omnid_core
+/// \file
+/// \brief This plugin first calculates each robot's end effector position, given the object platform position. Then, it fixes each end effector's pose, given their joint values.
+/// Name initialization.
+///     1. names of non-end-effector planning groups of each robot in SRDF
+///     2. names of the frames: object platform base, world, each robot's "floating world" frame (see URDF of the robot)
+
+
 #include <moveit/planning_request_adapter/planning_request_adapter.h>
 #include <class_loader/class_loader.hpp>
 #include <moveit/trajectory_processing/trajectory_tools.h>
 #include "omnid_core/delta_robot.h"
+#include "omnid_planning_adapter_plugin/omnid_planning_adapter_plugin.h"
 
+using std::vector;
+using std::string; 
 
 namespace omnid_planning_adapter_plugin
 {
@@ -47,86 +56,105 @@ namespace omnid_planning_adapter_plugin
     public:
         std::string getDescription() const override
         {
-            return "Planning adapter for post-processing planning results for the Omnid Delta Arm Project";
+            return "Planning adapter for pre-processing and post-processing planning results for the Omnid Delta Arm Project";
         }
 
         bool adaptAndPlan(const PlannerFn& planner, const planning_scene::PlanningSceneConstPtr& planning_scene,
                           const planning_interface::MotionPlanRequest& req, planning_interface::MotionPlanResponse& res,
                           std::vector<std::size_t>& /*added_path_index*/) const override
         {
+            // Thought: we modify each point along the trajectory, robot by robot.
+            // Workflow:
+            //  1. Recognize object platform's roll, pitch, yaw.
+            //  2. Plan object platform trajectory
+            //  3. Calculate (Note this is NOT PLANNING)pose of each robot eef based on object platform trajectory, using high level IK
+            //  4. Call low level IK, get all joint angles
+
+
             bool success = planner(planning_scene, req, res);
 
-            //get robot trajectory msg - its sequence is the same as the waypoints
-            moveit_msgs::RobotTrajectory trajectory_msg;
-            res.trajectory_->getRobotTrajectoryMsg(trajectory_msg);
+            moveit_msgs::RobotTrajectory traj;
+            res.trajectory_->getRobotTrajectoryMsg(traj);
+            if(!object_platform_.nameInitialized())
+                object_platform_.initializeJointLookup(traj.joint_trajectory.joint_names);
 
-            //initialize indices
-            if (!names_init_){
-                build_indices_arr(xyz_names_, xyz_indices_, trajectory_msg);
-                build_indices_arr(theta_names_, theta_indices_, trajectory_msg);
-                names_init_ = true;
-            }
-            for(auto& point: trajectory_msg.joint_trajectory.points){
-                std::vector<double>& positions = point.positions;
-                struct type_angular_position joints;
-                struct type_linear_position xyz_pose;
-                joints.theta1 = positions.at(theta_indices_.at(0));
-                joints.theta2 = positions.at(theta_indices_.at(1));
-                joints.theta3 = positions.at(theta_indices_.at(2));
-                delta_robot_forward_kinematics(&DELTA_ROBOT, &joints, &xyz_pose);
-                positions.at(xyz_indices_.at(0)) = xyz_pose.x;
-                positions.at(xyz_indices_.at(1)) = xyz_pose.y;
-                positions.at(xyz_indices_.at(2)) = xyz_pose.z;
-                //set each individual waypoints.
-                res.trajectory_ -> setRobotTrajectoryMsg (planning_scene -> getCurrentState(), trajectory_msg);
+            for(auto& traj_point: traj.joint_trajectory.points) {
+                //get the pose of the object platform
+                tf2::Transform platform_pose;
+                object_platform_.calcPlatformPoseTf(traj_point, platform_pose);
 
-            }
-            //TODO
-            for(auto name:theta_indices_){
-                ROS_INFO_STREAM("xyz index: "<<name);
+                for (unsigned int i = 0; i < delta_robots_.size(); ++i){
+                    // high-level planning for the robot
+                    tf2::Transform robot_to_eef;
+                    const auto& robot = delta_robots_.at(i);
+                    object_platform_.getNextEefPose(platform_pose, robot.getRobotToWorldTf(),
+                                                    robot.getWorldToRobotTf(), robot_to_eef);
+
+                    if (!robot.nameInitialized()){
+                        robot.initializeJointLookup(traj.joint_trajectory.joint_names, planning_scene);
+                    }
+
+                    if(!robot.calcLowLevelIk(planning_scene, robot_to_eef, traj_point)){
+                        ROS_WARN_STREAM("[omnid_planning_adapter_plugin]: Planning failed at robot " << i);
+                        return false;
+                    }
+                }
+
+                res.trajectory_ -> setRobotTrajectoryMsg (planning_scene -> getCurrentState(), traj);
             }
             return success;
         }
 
-        void initialize(const ros::NodeHandle& /*nh*/) override
+        void initialize(const ros::NodeHandle& /*nh_*/) override
         {
-            names_init_ = false;
-            xyz_indices_.resize(3);
-            // TODO read in params with names
-            std::string theta_name = "theta";
+            nh_ = ros::NodeHandle ("omnid_moveit");
+            vector<string> robot_planning_group_names; // each robot (not including the object platform arm) planning group's name in SRDF
+            vector<string> robot_names;    //the first part of joint names in URDF.
+            string object_platform_name;
+            string group_reference_frame_name;
+            string world_frame_name;
+            string floating_world_frame_name; // the name of the first "floating world" name of each robot. please include '/' if there is any. see each robot's URDF
 
-            //build name lookups.  theta_indices_ and xyz_indices are in the same order
-            theta_names_.resize(3);
-            theta_indices_.resize(3);
-            for (unsigned int i = 0; i < 3; ++i){
-                theta_names_.at(i) = theta_name + "_" + std::to_string(i+1);
+            if (!readRosParamStringVec(robot_planning_group_names, "robot_planning_group_names"))
+                robot_planning_group_names = {"end_effector_arm_1", "end_effector_arm_2", "end_effector_arm_3"};
+
+            if(!readRosParamStringVec(robot_names, "robot_names"))
+                robot_names = {"robot_1", "robot_2", "robot_3"};
+            object_platform_name = nh_.param("object_platform_name", string("object_platform"));
+            group_reference_frame_name = nh_.param("group_reference_frame_name", string("object_platform_base"));
+            world_frame_name = nh_.param("world_frame_name", string("world"));
+            floating_world_frame_name = nh_.param("floating_world_frame_name", string("/floating_world_0"));
+
+            // Initialize the robots
+            object_platform_ = Object_Platform_Adapter(object_platform_name, group_reference_frame_name,
+                                                       world_frame_name);
+            delta_robots_.reserve(robot_names.size());
+            for (unsigned int i = 0; i < robot_names.size(); ++i){
+                //This is for base frame name = robot frames robot_1/floating_world_0. Change this if necessary.
+                delta_robots_.emplace_back(robot_planning_group_names.at(i), robot_names.at(i), robot_names.at(i) + floating_world_frame_name, world_frame_name);
             }
-            //TODO REad in params
-            xyz_names_ = {"x", "y", "z"};
         }
 
     private:
-        mutable bool names_init_;
-        std::vector <std::string> theta_names_;
-        mutable std::vector<unsigned int> theta_indices_; //assume the the joints are named in the pattern xxx_1, xxx_2, xxx_3.
-        std::vector <std::string> xyz_names_;
-        mutable std::vector<unsigned int> xyz_indices_;
+        ros::NodeHandle nh_;
 
-        /// \brief: pass in the joint model group, and the names and index arrays of either the xyz or the regular joints
-        void build_indices_arr(const std::vector<std::string>& names, std::vector<unsigned int>& indices, const moveit_msgs::RobotTrajectory& trajectory_msg) const
-        {
-            unsigned int current_id = 0;
-            for(const auto& name:trajectory_msg.joint_trajectory.joint_names){
-                auto name_itr = std::find(names.begin(), names.end(), name);
-                if (name_itr != names.end()){
-                    indices.at(name_itr - names.begin()) = current_id;
+        vector<Delta_Robot_Adapter> delta_robots_;
+        Object_Platform_Adapter object_platform_;
+
+        bool readRosParamStringVec(vector<string>& vec, string param_name){
+            if (nh_.hasParam(param_name)){
+                XmlRpc::XmlRpcValue temp;
+                nh_.getParam(param_name, temp);
+                for (unsigned int i = 0; i < temp.size(); ++i ){
+                    vec.push_back(static_cast<string>(temp[i]));
                 }
-                ++current_id;
+                return true;
             }
-        };
+            else return false;
+        }
+
     };
 }
 
 CLASS_LOADER_REGISTER_CLASS(omnid_planning_adapter_plugin::OmnidPlanningRequestAdapter, planning_request_adapter::PlanningRequestAdapter);
-
 
