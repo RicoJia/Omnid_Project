@@ -30,7 +30,7 @@ The motion planning pipeline includes
    - tf2_armadillo: transformations for common Armadillo matrices and transform datatypes in ROS tf2 and geometry_msgs   
  ![](https://media.giphy.com/media/6MiY7FDVTuBx0ZuSn1/giphy.gif)
  
- docker_setup
+ There's also some files for setting up the docker in `docker_setup`
   - docker file: docker image file
   - dockint: tool to build a docker container. Created by Dr. Matt Elwin
   - ros_settings.bash: settings to source when starting the docker file
