@@ -45,16 +45,15 @@ As a universal way to setup the workspace,
         cd omnid/src
         git clone https://github.com/RicoJia/Omnid_Project.git
    ```
-2. Pull Dependencies
+2. Pull Dependencies 
     ```shell script
          cd Omnid_Project
     ```
    - Install VCS tool, [see here](https://github.com/dirk-thomas/vcstool)
-   - Use VCS tool to download all necessary packages
+   - Use VCS tool to download all necessary packages. **If VCS tool does not work, try git clone all pacakges in ```docker_setup/omnid_docs.repos``` manually.**   
         ```shell script
            vcs import < docker_setup/omnid_docs.repos
         ```
-   - if the above does not work, try git clone all pacakges in ```omnid_docs.repos``` manually.   
    - ```cd ../..``` go to the root of the package
 
 3. Build a docker container and start it(Please use this dockerfile as it contains the latest dependencies we need)
@@ -71,13 +70,16 @@ As a universal way to setup the workspace,
         ./dockint run omnid bash
       ```   
     
-4. Build the package in the docker  
-   - ```source src/Omnid_Project/docker_setup/ros_settings.bash``` this will setup some initial settings 
+4. Build the package in the docker container  
+   - ```source /opt/ros/noetic/setup.bash``` this will setup some initial settings 
    - ```catkin build``` build this package
-   - ```source devel/setup.bash```   Source the workspace
+   - ```source src/Omnid_Project/docker_setup/ros_settings.bash```   Source the workspace and some ros settings
    - ```roslaunch omnid omnid.launch ``` Launch the project
    - Have fun planning!
 
+5. Once done with the project
+   - ```exit``` to exit the container
+   - ```./dockint stop omnid``` to stop the container
 
 ### Basic Usage
 On Rviz, 
