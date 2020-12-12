@@ -1,5 +1,6 @@
 # Omnid Simulator and Moveit Packages
-![](https://miro.medium.com/max/600/1*aVR3_S5KSilwzJTvuMUfZA.gif)
+
+![](https://media.giphy.com/media/vFKqnCdLPNOKc/giphy.gif)
 
 
 ### Usage
@@ -19,10 +20,10 @@ As a universal way to setup the workspace,
    - Install VCS tool, [see here](https://github.com/dirk-thomas/vcstool)
    - Use VCS tool to download all necessary packages
         ```shell script
-           vcs import < /docker_setup/omnid_docs.repos
+           vcs import < docker_setup/omnid_docs.repos
         ```
-   - if the above does not work, try git clone all pacakges manually.   
-   - ```cd ../..``` go to root of the package
+   - if the above does not work, try git clone all pacakges in ```omnid_docs.repos``` manually.   
+   - ```cd ../..``` go to the root of the package
 
 3. Build a docker container and start it(Please use this dockerfile as it contains the latest dependencies we need)
    - Build the image
