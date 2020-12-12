@@ -1,4 +1,6 @@
 # Omnid Simulator and Moveit Packages
+![](https://miro.medium.com/max/600/1*aVR3_S5KSilwzJTvuMUfZA.gif)
+
 
 ### Usage
 The repo runs on Ubuntu Linux 20.04, ROS Noetic, rosdep, catkin_tools and several other prerequisites. 
@@ -35,7 +37,6 @@ As a universal way to setup the workspace,
         ./dockint start omnid $(pwd)
         ./dockint run omnid bash
       ```   
-3. Pull Dependencies
     
 4. Build the package in the docker  
    - ```source src/Omnid_Project/docker_setup/ros_settings.bash``` this will setup some initial settings 
