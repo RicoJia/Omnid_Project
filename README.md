@@ -9,9 +9,20 @@ As a universal way to setup the workspace,
         mkdir -p omnid/src
         cd omnid/src
         git clone https://github.com/RicoJia/Omnid_Project.git
-        cd .. 
    ```
-2. Build a docker container and start it(Please use this dockerfile as it contains the latest dependencies we need)
+2. Pull Dependencies
+    ```shell script
+         cd Omnid_Project
+    ```
+   - Install VCS tool, [see here](https://github.com/dirk-thomas/vcstool)
+   - Use VCS tool to download all necessary packages
+        ```shell script
+           vcs import < /docker_setup/omnid_docs.repos
+        ```
+   - if the above does not work, try git clone all pacakges manually.   
+   - ```cd ../..``` go to root of the package
+
+3. Build a docker container and start it(Please use this dockerfile as it contains the latest dependencies we need)
    - Build the image
       ```
             cp src/Omnid_Project/docker_setup/dockint .
