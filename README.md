@@ -46,9 +46,7 @@ As a universal way to setup the workspace,
         git clone https://github.com/RicoJia/Omnid_Project.git
    ```
 2. Pull Dependencies 
-    ```shell script
-         cd Omnid_Project
-    ```
+   - ```cd Omnid_Project``` Go to the project directory
    - Install VCS tool, [see here](https://github.com/dirk-thomas/vcstool)
    - Use VCS tool to download all necessary packages. **If VCS tool does not work, try git clone all pacakges in ```docker_setup/omnid_docs.repos``` manually.**   
         ```shell script
@@ -73,7 +71,8 @@ As a universal way to setup the workspace,
 4. Build the package in the docker container  
    - ```source /opt/ros/noetic/setup.bash``` this will setup some initial settings 
    - ```catkin build``` build this package
-   - ```source src/Omnid_Project/docker_setup/ros_settings.bash```   Source the workspace and some ros settings
+   - ```source src/Omnid_Project/docker_setup/ros_settings.bash```   Source ros settings
+   - ```source devel/setup.bash``` Source the workspace
    - ```roslaunch omnid omnid.launch ``` Launch the project
    - Have fun planning!
 
