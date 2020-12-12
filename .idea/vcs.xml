@@ -2,6 +2,6 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/moveit_visual_tools" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/omnid_supplementary_packages/moveit_visual_tools" vcs="Git" />
   </component>
 </project>

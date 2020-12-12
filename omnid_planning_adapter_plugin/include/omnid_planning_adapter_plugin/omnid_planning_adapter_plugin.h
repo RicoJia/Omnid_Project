@@ -112,7 +112,15 @@ namespace omnid_planning_adapter_plugin{
         Object_Platform_Adapter() = default;
         Object_Platform_Adapter(const string& robot_name, const string& body_frame_name, const string& world_frame_name) :
             Adapter(robot_name, body_frame_name, world_frame_name)
-        {}
+        {
+            ros::NodeHandle nh;
+            double object_clearance, object_thickness, h_platform;
+            nh.getParam("object_clearance", object_clearance);
+            nh.getParam("object_thickness", object_thickness);
+            nh.getParam("h_platform", h_platform);
+            object_z_correction_ = object_clearance + (object_thickness + h_platform)/2.0;
+
+        }
 
         /// \brief initialize a look up table that maps joint names to their indices in joint_names.
         bool initializeJointLookup(const std::vector <std::string> &joint_names) const {
@@ -134,7 +142,7 @@ namespace omnid_planning_adapter_plugin{
             //read  x, y, z, roll, pitch, yaw as the body frame pose, then convert it to tf2::Transform
             double x = traj_point.positions[joint_lookup_["x"]];
             double y = traj_point.positions[joint_lookup_["y"]];
-            double z = traj_point.positions[joint_lookup_["z"]];
+            double z = traj_point.positions[joint_lookup_["z"]] - object_z_correction_; //this come from the overall clearance between the object and each robot platform
             double roll = traj_point.positions[joint_lookup_["roll"]];
             double pitch = traj_point.positions[joint_lookup_["pitch"]];
             double yaw = traj_point.positions[joint_lookup_["yaw"]];
@@ -155,6 +163,7 @@ namespace omnid_planning_adapter_plugin{
 
     private:
         mutable std::unordered_map<std::string, unsigned int> joint_lookup_;
+        double object_z_correction_;
     };
 
     class Delta_Robot_Adapter : public Adapter{

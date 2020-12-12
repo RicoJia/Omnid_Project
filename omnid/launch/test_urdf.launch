@@ -1,5 +1,5 @@
 <launch>
-    <arg name="test_serial_urdf" default="false" doc="True if we visualize the Serialized Delta Arm for Moveit"/>
+    <arg name="test_serial_urdf" default="true" doc="True if we visualize the Serialized Delta Arm for Moveit"/>
     <arg name="test_parallel_urdf" default="false" doc="True if we visualize the regular parallel Delta Arm for Moveit"/>
     <arg name="test_disk_urdf" default="false" doc="True if we visualize a circular object for the Delta Arm to carry"/>
 

@@ -18,7 +18,6 @@
 #include <moveit_msgs/DisplayTrajectory.h>
 #include <moveit_msgs/AttachedCollisionObject.h>
 #include <moveit_msgs/CollisionObject.h>
-#include <moveit_visual_tools/moveit_visual_tools.h>
 #include <visualization_msgs/InteractiveMarkerUpdate.h>
 #include <moveit/kinematics_base/kinematics_base.h>
 
@@ -32,7 +31,6 @@
 #include <memory>
 #include <algorithm>
 
-namespace rvt = rviz_visual_tools;
 using std::make_unique;
 using std::for_each;
 using std::vector;
@@ -178,6 +176,7 @@ namespace omnid_group_planning{
         ros::NodeHandle nh_;
         unsigned int leg_num_;  //number of legs, we are going to number our legs starting from 1.
         double delta_robot_base_offset_; //This is a hack. we are publishing the world frame pose, but rviz will recognize that as base_frame.
+        double object_z_correction_;
         std::vector<std::unique_ptr<Single_Omnid_Planner>> arms_;
         std::unique_ptr<Single_Omnid_Planner> object_platform_;
         ros::Subscriber eef_sub_;
@@ -225,8 +224,6 @@ namespace omnid_group_planning{
         initParams();
         object_platform_ = make_unique<Single_Omnid_Planner>(object_platform_planning_group_name_, nh_,
                                                              group_reference_frame_name_, world_frame_name_);
-        eef_sub_ = nh_.subscribe<visualization_msgs::InteractiveMarkerUpdate>(eef_update_topic_name_, 1, boost::bind(
-                &omnid_group_planning::Omnid_Group_Planner::subCB, this, _1));
         arms_.reserve(leg_num_);
         for (unsigned int i = 0; i < leg_num_; ++i){
             unsigned int robot_id = i + 1;
@@ -234,6 +231,9 @@ namespace omnid_group_planning{
             const std::string body_frame_name = body_frame_name_prefix_ + std::to_string(robot_id) + body_frame_name_suffix_;
             arms_.push_back( make_unique<Single_Omnid_Planner>(planning_group_name, nh_, body_frame_name, world_frame_name_) );
         }
+        // initialize subscriber callback after all robots have been initialized. Otherwise, other threads may prematurely call it!
+        eef_sub_ = nh_.subscribe<visualization_msgs::InteractiveMarkerUpdate>(eef_update_topic_name_, 1, boost::bind(
+                &omnid_group_planning::Omnid_Group_Planner::subCB, this, _1));
     };
 
     void Omnid_Group_Planner::initParams()
@@ -251,8 +251,12 @@ namespace omnid_group_planning{
         object_platform_eef_name_ = "object_platform_roll_link";
         eef_update_topic_name_ = "/rviz_moveit_motion_planning_display/robot_interaction_interactive_marker_topic/update";
         eef_update_frame_name_ = "EE:goal_object_platform_roll_link";
-        //TODO: omnid param
 
+        double object_clearance, object_thickness, h_platform;
+        nh_.getParam("object_clearance", object_clearance);
+        nh_.getParam("object_thickness", object_thickness);
+        nh_.getParam("h_platform", h_platform);
+        object_z_correction_ = object_clearance + (object_thickness + h_platform)/2.0;
     }
 
     void Omnid_Group_Planner::subCB(const visualization_msgs::InteractiveMarkerUpdate::ConstPtr &msg)
@@ -266,8 +270,9 @@ namespace omnid_group_planning{
             if (marker_pose.name == eef_update_frame_name_) {
                 vector<Pose> next_robot_poses(leg_num_);
                 auto object_platform_eef_pose = marker_pose.pose;
+                object_platform_eef_pose.position.z -= object_z_correction_;    //this come from the overall clearance between the object and each robot platform
                 if(highLevelIK(object_platform_eef_pose, next_robot_poses, arms_)){
-                    object_platform_->updateNextPose(object_platform_eef_pose, true);     //we update the marker pose if it's good
+                    object_platform_->updateNextPose(marker_pose.pose, true);     //we update the marker pose if it's good
                     for (unsigned id = 0; id < leg_num_; ++id) {
                         auto& arm = arms_.at(id);
                         arm->updateNextPose(next_robot_poses.at(id));

@@ -4,18 +4,20 @@
   <!--  a circular disk object for carrying. The link frame is positioned at the bottom of the link -->
 
   <!-- Radius of the base of the delta robot -->
-  <xacro:property name="R_disk" value="$(arg R_disk)" />
+  <xacro:property name="yaml_file"    value="$(find omnid)/params/params.yaml" />
+  <xacro:property name="properties"   value="${load_yaml(yaml_file)}" />
+
+  <xacro:property name="R_disk" value="${properties['object_inscribed_radius']}" />
 
   <!-- height (i.e. thickness) of the base -->
-  <xacro:property name="h_disk" value="$(arg h_disk)" />
+  <xacro:property name="h_disk" value="${properties['object_thickness']}" />
 
   <!-- mass of the base -->
-  <xacro:property name="M_disk" value="$(arg M_disk)" />
+  <xacro:property name="M_disk" value="${properties['object_mass']}" />
 
 
   <!-- Compute inertial properties for a cylinder, where the reference frame is centered.
        The axis of the cylinder-->
-
   <xacro:macro name="cylinder_inertia" params="M R h axis">
     <inertial>
       <mass value="${M}" />
@@ -78,6 +80,8 @@
   </material>
 
   <!-- define the base of the delta robot-->
+  <link name="world"/>
+
   <xacro:cylinder_link name="base_link"
                          M="${M_disk}"
                          R="${R_disk}"

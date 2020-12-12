@@ -109,7 +109,6 @@ line program has not been written
 <!--TODO: organize your yaml params -->
   <xacro:property name="yaml_file" value="$(find omnid)/params/params.yaml"/>
   <xacro:property name="yaml_params" value="${load_yaml(yaml_file)}"/>
-  <xacro:property name="object_clearance" value="${yaml_params['object_clearance']}"/>
   <xacro:property name="object_thickness" value="${yaml_params['object_thickness']}"/>
   <xacro:property name="object_inscribed_radius" value="${yaml_params['object_inscribed_radius']}"/>
 
@@ -426,7 +425,7 @@ line program has not been written
   <xacro:macro name="object_platform">
     <joint name="object_platform/fixed" type="fixed">
       <parent link="world"/>
-      <origin xyz="${object_platform_base_x} ${object_platform_base_y} ${object_platform_base_z + object_clearance + object_thickness/2.0}"/>
+      <origin xyz="${object_platform_base_x} ${object_platform_base_y} ${object_platform_base_z}"/>
       <child link="object_platform_base"/>
     </joint>
     <link name="object_platform_base"/>

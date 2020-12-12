@@ -1,12 +1,21 @@
 # This file has all the parameters needed for the omnid project
 
 #NOTE: Parameters shared by urdf, moveit plugins.
-object_clearance: 0.1   #the gap between the bottom of the object and the top of the robot end effector when the the object platform is horitontal
+object_clearance: 0.2   #the gap between the bottom of the object and the top of the robot end effector when the the object platform is horitontal
 object_thickness: 0.01
 object_inscribed_radius: 0.8  #the object is modelled as a cylinder in Moveit.
+object_mass: 50.0   #in kg
+base_positions: [[0.0, 0.0, 0.0], [0.5, 0.5, 0.0], [1.0, 0.0, 0.0]]   #Cartesian coordinates of the each robot's base_link
+h_platform: 0.01 #delta_arm_end_effector_thickness
+base_offset: 0.046375   #how much the base should be lifted to bring to the ground.
+leg_num: 3      #total number of legs
 
+#High level parameters
+robot_names: ["robot_1", "robot_2", "robot_3"]  #the first part of joint names in URDF.
+object_name: "object_platform"  #also is the prefix of the object platform's joints in the urdf for moveit
 
 omnid_moveit:
+  #TODO
   robot_planning_group_names: ["end_effector_arm_1", "end_effector_arm_2", "end_effector_arm_3"]  #each robot (not including the object platform arm) planning group's name in SRDF
   robot_names: ["robot_1", "robot_2", "robot_3"]  #the first part of joint names in URDF.
   object_platform_name: "object_platform"
@@ -16,14 +25,6 @@ omnid_moveit:
 
  
 omnid_simulator:
-  ########################### Delta Arm Group Params ###########################
-  base_positions: [[0.0, 0.0, 0.0], [1.0, 0.0, 0.0], [0.5, 0.5, 0.0]]   #Cartesian coordinates of the base_link frames
-  h_platform: 0.01 #delta_arm_end_effector_thickness
-
-  ########################### Single Delta Arm Params
-  base_offset: 0.046375   #how much the base should be lifted to bring to the ground.
-  leg_num: 3      #total number of legs
-
   #Joint Position Controller parameters
   kp : 1
   kd : 0.6
@@ -39,10 +40,10 @@ omnid_simulator:
   # We initialize our arm with identical pre_spring joint values (radians)
   pre_spring_joint_info: {"phi": 0.70}   #name of the pre_spring_joint: joint_initial_value
   after_spring_joint_info: {"theta":1.50} #name of the after_spring_joint: joint_initial_value
+  object_platform_joint_info: {"x": 0, "y": 0, "z": 0, "roll": 0, "pitch": 0, "yaw": 0}   #PLEASE DO NOT CHANGE THESE NAMES AND THEIR ORDERING! joint names should match those of moveit urdf's object platform joints
 
   end_effector_initial_xyz: {"x":0.0, "y":0.0, "z":0.42}
-  end_effector_thickness: 0.01   #thickness of the end effector platform
-  end_effector_radius: 0.062
+  end_effector_radius: 0.062    #Delta Robot end effector radius
   end_effector_name: "platform_link"    #end-effector platform name
 
   leg_pos_on_end_effector: {"upper_leg_1": 0.0, "upper_leg_2": rad(2.0*pi/3.0), "upper_leg_3": rad(4.0*pi/3.0)} #angular positions of upper legs on the platform
@@ -57,7 +58,7 @@ omnid_simulator:
   torque_k: 1000.0    #torsion spring constant
 
   #controller setup for Moveit! interface. Change this before modifying the Moveit! setup
-  controller_namespace: "end_effector_arm_controller"   #action_ns of omnid_moveit_config's controllers.yaml
+  controller_namespace: "all_arms_controller"   #action_ns of omnid_moveit_config's omnid_controllers.yaml
 
   #Test parameters. For production default value is false for every item here
   after_spring_actuated: true   #By default, the pre-spring joints are actuated. However, that requires a PID controller. For testing purposes, we can apply control directly on after-spring joints.

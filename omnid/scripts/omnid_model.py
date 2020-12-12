@@ -15,7 +15,8 @@ class Omnid_Model:
 
   def reset(self, test_with_end_effector_xyz, after_spring_actuated, urdf_name, base_position):
     self.buildParamLists(test_with_end_effector_xyz, after_spring_actuated)
-    self.model_unique_id = p.loadURDF(self.urdfRootPath + "/" + urdf_name , basePosition=[base_position[0],base_position[1],base_position[2]+self.base_offset], useFixedBase=True)
+    self.base_position = [base_position[0],base_position[1],base_position[2]+self.base_offset]
+    self.model_unique_id = p.loadURDF(self.urdfRootPath + "/" + urdf_name , basePosition=self.base_position, useFixedBase=True)
     self.buildLookups()
     self.resetLinkFrictions(lateral_friction_coefficient=0)
     self.resetJointsAndMotors()
@@ -31,18 +32,18 @@ class Omnid_Model:
       Then, we build Link and joint name lookups (dictionary) for various uses: 
         pre_spring joint names, after_spring_joint_names, spring_parent_link_name, spring_child_link_name, end-effector names
       """
-      #TODO rospy.get_param("~")
-      self.base_offset= rospy.get_param("~base_offset")    #The base was offseted in the URDF of the robot. Change this value if URDF has changed.
-      self.leg_num = rospy.get_param("~leg_num")
+      self.base_offset= rospy.get_param("base_offset")    #The base was offseted in the URDF of the robot. Change this value if URDF has changed.
+      self.leg_num = rospy.get_param("leg_num")
+      self.object_thickness = rospy.get_param("object_thickness") #thickness of the end effector platform
 
       self.kp = rospy.get_param("~kp")
       self.kd = rospy.get_param("~kd")
       self.max_motor_force = rospy.get_param("~max_motor_force")      
 
-      self.end_effector_thickness = rospy.get_param("~end_effector_thickness") #thickness of the end effector platform
       self.end_effector_radius = rospy.get_param("~end_effector_radius")
       self.leg_pos_on_end_effector = rospy.get_param("~leg_pos_on_end_effector")
       self.end_effector_name = rospy.get_param("~end_effector_name")
+      self.end_effector_initial_xyz = rospy.get_param("~end_effector_initial_xyz")
 
       spring_parent_link_name = rospy.get_param("~spring_parent_link_name")
       spring_child_link_name = rospy.get_param("~spring_child_link_name")
@@ -59,7 +60,6 @@ class Omnid_Model:
       self.force_axis_p = rospy.get_param("~force_axis_p")
       self.moment_arm_p = rospy.get_param("~pre_spring_radius")
       self.force_pos_p = rospy.get_param("~force_pos_p")
-      self.end_effector_initial_xyz = rospy.get_param("~end_effector_initial_xyz")
 
 
       #spring joints and links
@@ -91,8 +91,8 @@ class Omnid_Model:
 
   def buildLookups(self):
     """
-    Build following look ups: 
-    1. jointNameToId, linkNameToID (both dictionary). 
+    Build following look ups:
+    1. jointNameToId, linkNameToID (both dictionary).
     Note that since each link and its parent joint has the
     same ID, you can use this to get link_id as well, except that you will have to access base frame by link_id = -1.
     A very important assumption here is in your URDF, you first have a world link, then have a base_link
@@ -126,7 +126,7 @@ class Omnid_Model:
                            contactDamping=0.0,
                            maxJointVelocity=10000
                            )
-          
+
   def resetJointsAndMotors(self):
     """
     We do two things here:
@@ -209,7 +209,6 @@ class Omnid_Model:
   def returnJointStateMsg(self):
       """
       Publish joint states. Note that effort is the motor torque applied during the last stepSimulation.
-      :return:
       """
       joint_state_msg = JointState()
       for joint_name in self.jointNameToId.keys():

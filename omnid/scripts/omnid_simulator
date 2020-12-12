@@ -3,6 +3,13 @@
 '''
 The Omnid simulator that connects bullet to ROS.
 Subscribes : /cmd_vel
+Workflow Summary:
+    - read parameters
+    - calculate centroid of the object and place it there.
+    - setup pybullet simulator
+    - initialize delta robots, the disk object
+    - connect the disk to the robots
+    - at each step of the simulation, the robot listens to the trajectory waypoints and execute it`
 '''
 
 import rospy
@@ -27,158 +34,217 @@ from control_msgs.msg import FollowJointTrajectoryResult
 roslib.load_manifest("omnid")
 
 class OmnidArmROS:
-  def __init__(self, urdf_path, base_position = [0,0], id = None):
+  def __init__(self, robot_name, urdf_path, base_position = [0,0], id = None):
     """
     initialize an Omnid Arm with ROS interface
     :param urdf_path: string, Relative path (to the root of the package) to the URDF directory
     :param base_position: list like [x,y] of the center of the base of the robot
     :param id: int, id of the arm. If none, all topics and actions will not be labeled. Else, they will be labeled like "topic_name_id".
     """
+    self.robot_name = robot_name
     id_suffix = '_' + str(id) if id is not None else ''
-    self.joint_state_pub = rospy.Publisher('omnid/joint_states' + id_suffix, JointState, queue_size=10)
     use_spring = not(rospy.get_param("~test_without_spring", False))
     test_with_end_effector_xyz = rospy.get_param("~test_with_end_effector_xyz")
     after_spring_actuated = rospy.get_param("~after_spring_actuated")
     urdf_name = rospy.get_param("~urdf_name")
-    self.omnid_model = Omnid_Model(urdfRootPath=urdf_path,
-                                   use_spring=use_spring,
-                                   test_with_end_effector_xyz=test_with_end_effector_xyz,
-                                   after_spring_actuated = after_spring_actuated,
-                                   urdf_name = urdf_name, 
-                                   base_position = base_position)
+    self.omnid_model = Omnid_Model(
+        urdfRootPath=urdf_path,
+        use_spring=use_spring,
+        test_with_end_effector_xyz=test_with_end_effector_xyz,
+        after_spring_actuated = after_spring_actuated,
+        urdf_name = urdf_name,
+        base_position = base_position
+    )
     test_joint_control = rospy.get_param("~test_joint_control")
     if test_joint_control:
       self.joint_state_sub = rospy.Subscriber('joint_states_control'+id_suffix, JointState, self.updateJointStates_CB)
-    else:
-      controller_namespace = rospy.get_param("~controller_namespace")
-      # TODO - See interface with Moveit!
-      # self.action_server = actionlib.SimpleActionServer(controller_namespace + '/follow_joint_trajectory',
-      #                                                       FollowJointTrajectoryAction,
-      #                                                       execute_cb=self.processFollowTrajectory,
-      #                                                       auto_start=False)
-      # self.action_server.start()
 
-  def jointStatesPub(self):
-    self.joint_state_pub.publish(self.omnid_model.returnJointStateMsg())
+  def getJointStates(self):
+    return self.omnid_model.returnJointStateMsg()
+
   def executeMotionCommands(self):
     self.omnid_model.executeAllMotorPosCommands()
+
+  def updateJointStates(self, name,position):
+      self.omnid_model.updateJointStates(name, position)
+
   def updateJointStates_CB(self, msg):
     """
     API function for as a ROS Subscriber callback_function updating joint positions.
     """
     self.omnid_model.updateJointStates(msg.name, msg.position)
 
-  def processFollowTrajectory(self, goal):
-      """
-      Call back function for Moveit! trajectory following action request.
-      :param goal: the goal trajectory of actuated joints, i.e, phi angles.
-      """
-      success = True
-      traj = goal.trajectory
-      num_points = len(traj.points)
-      # figure out joint names and their positions
-      joint_names = traj.joint_names
-      #start from point 1, since the first point is the current starting point
-      for i in range(1, num_points):
-          #check for pre-emption
-          if self.action_server.is_preempt_requested():
-              rospy.loginfo("%Trajectory Action Preempted on Omnid" )
-              self.action_server.set_preempted()
-              success = False
-              break
-          #figure out the duration and joint positions of each trajectory segment
-          duration = (traj.points[i].time_from_start - traj.points[i-1].time_from_start ).to_sec()
-          joint_positions = traj.points[i].positions
-          #update the joints
-          self.omnid_model.updateJointStates(joint_names, joint_positions)
-          #realize each segment and time it
-          r = rospy.Rate(1.0/duration)
-          r.sleep()
-          #check if the action has been preempted
 
-      if success:
-          msg = 'Trajectory completed'
-          rospy.loginfo(msg)
-          res = FollowJointTrajectoryResult()
-          self.action_server.set_succeeded(result=res, text=msg)
+class OmnidGroup:
+    def __init__(self):
+        urdf_path = ((rospkg.RosPack()).get_path('omnid'))+'/urdf'
+        base_positions = rospy.get_param("base_positions")
+        self.robot_names = rospy.get_param("robot_names")
+        self.object_name = rospy.get_param("object_name")
+        self.omnid_arms_ros = []
 
-def getCentroid(points):
-    """
-    return the centroid of massless points
-    :param points: list of mass less point's [x, y, z]
-    :return: [x, y, z]
-    """
-    return np.array([sum( [ps[0] for ps in base_positions] ),
-                     sum( [ps[1] for ps in base_positions] ),
-                     sum( [ps[2] for ps in base_positions] )])\
-           /len(base_positions)
+        #initialize the arms [0, 1 ...]
+        omnid_num = len(base_positions)
+        for id in range(omnid_num):
+            base_position = base_positions[id]
+            omnid_arm_ros = OmnidArmROS(self.robot_names[id], urdf_path, id=id, base_position=base_position)
+            self.omnid_arms_ros.append(omnid_arm_ros)
+            #Initialize a disk
 
-def connectObjectToOmnids(omnid_arms_ros, object):
-    """
-    We place the object right on top of the omnid arms. We assume given the object spawn position, the object is large enough to be connected
-    to the omnid arms. We also assume that the object is spawned right on top of the delta arm platforms.
-    :param omnid_arms_ros: list of omnid_arm_ros objects
-    :param object: object to be carried
-    """
-    spawn_position = object.getObjectInfo()["spawn_position"]
-    maxPoint2PointForce = 500000
-    for id in range(len(omnid_arms_ros)):
-        platform_pos = np.array(omnid_arms_ros[id].omnid_model.getEndEffectorPosition())
-        platform_top = np.array([platform_pos[0], platform_pos[1], spawn_position[2]])    #assume that the object is spawned right on top of the delta arm platforms.
-        child_frame_pos = platform_top - platform_pos
-        parent_frame_pos = platform_top - spawn_position  # Cartesian coordnates on the platform, r_platform = 0.062
-        joint_axis = [0,0,0]
-        print("parent_frame_pos: ", parent_frame_pos)
-        print("omnid_arms_ros[id].omnid_model.getEndEffectorLinkID(): ", omnid_arms_ros[id].omnid_model.getEndEffectorLinkID())
+        spawn_position = self.getCentroid(base_positions)
+        spawn_position[2] = self.omnid_arms_ros[0].omnid_model.getEndEffectorPosition()[2] + (rospy.get_param("h_platform") + rospy.get_param("object_thickness"))/2.0 + rospy.get_param("object_clearance")
+        self.disk = Disk(urdf_path, spawn_position = spawn_position)
 
-        new_joint_id = p.createConstraint(object.model_unique_id, object.getEndEffectorLinkID(), #we assume base_link of the object is the first link of the object
-                                          omnid_arms_ros[id].omnid_model.model_unique_id, omnid_arms_ros[id].omnid_model.getEndEffectorLinkID(),
-                                          p.JOINT_POINT2POINT, joint_axis, parent_frame_pos, child_frame_pos)
-        p.changeConstraint(new_joint_id, maxForce=maxPoint2PointForce)
+        #connect the disk to the omnids
+        self.connectObjectToOmnids()
+
+        controller_namespace = rospy.get_param("~controller_namespace")
+        self.action_server = actionlib.SimpleActionServer(controller_namespace + '/follow_joint_trajectory',
+                                                      FollowJointTrajectoryAction,
+                                                      execute_cb=self.processFollowTrajectory,
+                                                      auto_start=False)
+        self.action_server.start()
+        self.joint_state_pub = rospy.Publisher('omnid/joint_states', JointState, queue_size=10)
+
+    def getCentroid(self, points):
+        """
+        return the centroid of massless points
+        :param points: list of mass less point's [x, y, z]
+        :return: [x, y, z]
+        """
+        return np.array([sum( [ps[0] for ps in points] ),
+                         sum( [ps[1] for ps in points] ),
+                         sum( [ps[2] for ps in points] )]) \
+               /len(points)
+
+    def calTrajStartEndIndices(self, joint_names):
+        """
+        calculate the start and end indices of a robot in a trajectory msg: [start, end)
+        :param joint_names: joint names list from a trajectory msg.
+        """
+        try: self.start_indices_in_traj
+        except AttributeError:
+            robot_num = len(self.robot_names)
+            self.start_indices_in_traj = -1 * np.ones(robot_num, np.int8)
+            self.end_indices_in_traj = -1 * np.ones(robot_num, np.int8)
+            for joint_name_i, joint_name in enumerate(joint_names):
+                for id, robot_name in enumerate(self.robot_names):
+                    if robot_name in joint_name:
+                        if self.start_indices_in_traj[id] == -1: self.start_indices_in_traj[id] = joint_name_i
+                        self.end_indices_in_traj[id] = joint_name_i + 1   # here we assume in this trajectory_msg, one robot has consecutive fields
+
+    def connectObjectToOmnids(self):
+        """
+        We place the object right on top of the omnid arms. We assume given the object spawn position, the object is large enough to be connected
+        to the omnid arms. We also assume that the object is spawned right on top of the delta arm platforms.
+        """
+        spawn_position = self.disk.getObjectInfo()["spawn_position"]
+        maxPoint2PointForce = 500000
+        for id in range(len(self.omnid_arms_ros)):
+            platform_pos = np.array(self.omnid_arms_ros[id].omnid_model.getEndEffectorPosition())
+            platform_top = np.array([platform_pos[0], platform_pos[1], spawn_position[2]])    #assume that the object is spawned right on top of the delta arm platforms.
+            child_frame_pos = platform_top - platform_pos
+            parent_frame_pos = platform_top - spawn_position  # Cartesian coordnates on the platform, r_platform = 0.062
+
+            joint_axis = [0,0,0]
+
+            new_joint_id = p.createConstraint(self.disk.model_unique_id, self.disk.getEndEffectorLinkID(), #we assume base_link of the object is the first link of the object
+                                              self.omnid_arms_ros[id].omnid_model.model_unique_id, self.omnid_arms_ros[id].omnid_model.getEndEffectorLinkID(),
+                                              p.JOINT_POINT2POINT, joint_axis, parent_frame_pos, child_frame_pos)
+            p.changeConstraint(new_joint_id, maxForce=maxPoint2PointForce)
+
+    def processFollowTrajectory(self, goal):
+        """
+        Call back function for Moveit! trajectory following action request. Note that this is a separate thread
+        from the main one.
+        :param goal: the goal trajectory of actuated joints, i.e, phi angles.
+        """
+        # Workflow:
+        #figure out joint names and their positions
+        #start from point 1, since the first point is the current starting point
+        #check for pre-emption
+        #figure out the duration and joint positions of each trajectory segment
+        #realize each segment and time it
+        #check if the action has been preempted
+
+        success = True
+        traj = goal.trajectory
+        num_points = len(traj.points)
+        traj_joint_names = traj.joint_names
+        self.calTrajStartEndIndices(traj_joint_names)
+
+        for i in range(1, num_points):
+            if self.action_server.is_preempt_requested():
+                rospy.loginfo("%Trajectory Action Preempted on Omnid" )
+                self.action_server.set_preempted()
+                success = False
+                break
+            duration = (traj.points[i].time_from_start - traj.points[i-1].time_from_start ).to_sec()
+            for id, omnid_arm_ros in enumerate(self.omnid_arms_ros):
+                joint_positions = traj.points[i].positions[self.start_indices_in_traj[id] : self.end_indices_in_traj[id]]
+                joint_names = traj_joint_names[self.start_indices_in_traj[id] : self.end_indices_in_traj[id]]
+                joint_names = self.removePrefixList(joint_names, self.robot_names[id])
+                omnid_arm_ros.updateJointStates(joint_names, joint_positions)
+            r = rospy.Rate(1.0/duration )
+            r.sleep()
+        if success:
+            msg = 'Trajectory completed'
+            rospy.loginfo(msg)
+            res = FollowJointTrajectoryResult()
+            self.action_server.set_succeeded(result=res, text=msg)
+
+    def publishJointStates(self):
+        all_joint_states = JointState()
+        for id, omnid_arm_ros in enumerate(self.omnid_arms_ros):
+            joint_states = omnid_arm_ros.getJointStates()
+            joint_states.name = [self.robot_names[id] + '/' + name for name in joint_states.name]
+            self.appendToJointStateMsg(all_joint_states, joint_states)
+
+        object_joint_states = self.disk.getJointStates()
+        object_joint_states.name = [self.object_name + '/' + name for name in object_joint_states.name]
+        self.appendToJointStateMsg(all_joint_states, object_joint_states)
+        self.joint_state_pub.publish(all_joint_states)
+
+    def executeMotionUpdates(self):
+        for omnid_arm_ros in self.omnid_arms_ros:
+            omnid_arm_ros.executeMotionCommands()
+
+    def appendToJointStateMsg(self, to_be_appended_msg, to_append_msg):
+        to_be_appended_msg.name += to_append_msg.name
+        to_be_appended_msg.position += to_append_msg.position
+        to_be_appended_msg.velocity += to_append_msg.velocity
+        to_be_appended_msg.effort += to_append_msg.effort
+
+    def removePrefixList(self, ls, prefix):
+        return [str.replace(prefix + "/", "") for str in ls]
+
 
 
 if __name__ == "__main__":
     try:
       rospy.init_node("omnid_node")
-      c = p.connect(p.SHARED_MEMORY)     # or p.DIRECT for non-graphical version
-      if (c < 0):
-        c = p.connect(p.GUI)
+      c = p.connect(p.GUI)
       p.setAdditionalSearchPath(pybullet_data.getDataPath())
       p.resetSimulation()
       p.loadURDF("plane.urdf" )  #loads from the root pybullet library
       p.setGravity(0, 0, -10.0)
-      urdf_path = ((rospkg.RosPack()).get_path('omnid'))+'/urdf'
-      base_positions = rospy.get_param("~base_positions")
-      omnid_arms_ros = []
+
       p.setRealTimeSimulation(0)
-
-      #initialize the arms [0, 1 ...]
-      omnid_num = len(base_positions)
-      for id in range(omnid_num):
-          base_position = base_positions[id]
-          omnid_arm_ros = OmnidArmROS(urdf_path, id=id, base_position=base_position)
-          omnid_arms_ros.append(omnid_arm_ros)
-      #Initialize a disk
-      spawn_position = getCentroid(base_positions)
-      spawn_position[2] = omnid_arms_ros[0].omnid_model.getEndEffectorPosition()[2] + rospy.get_param("~h_platform") + 0.1
-      print("z: ", spawn_position[2])
-      disk = Disk(urdf_path, spawn_position = spawn_position)
-
-      #connect the disk to the omnids
-      connectObjectToOmnids(omnid_arms_ros, disk)
 
       # global joint_values
       timeStep = 0.0005
       r = rospy.Rate(1.0/timeStep)
       p.setTimeStep(timeStep)
 
+      og = OmnidGroup()
 
       while p.isConnected() and not rospy.is_shutdown():
-        for omnid_arm_ros in omnid_arms_ros:
-            # omnid_arm_ros.executeMotionCommands()
-            omnid_arm_ros.jointStatesPub()
-        p.stepSimulation()
-        r.sleep()
-      p.disconnect()
+          og.publishJointStates()
+          og.executeMotionUpdates()
+          p.stepSimulation()
+          r.sleep()
+
     except rospy.ROSInterruptException:
         pass
+
+    p.disconnect()

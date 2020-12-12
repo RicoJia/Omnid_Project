@@ -8,9 +8,19 @@
 
     <group unless="$(arg test_spring)">
         <node pkg="omnid" type="omnid_simulator" name="omnid_simulator" output="screen" required="true"/>
-<!--        <include file="$(find omnid)/launch/moveit_omnid.launch"/>-->
-<!--        <node pkg="omnid_move_group_interface" name="omnid_move_group_interface_node" type="omnid_move_group_interface_node" output="screen"/>-->
+        <include file="$(find omnid)/launch/moveit_omnid.launch"/>
+        <node pkg="omnid_move_group_interface" name="omnid_move_group_interface_node" type="omnid_move_group_interface_node" output="screen"/>
     </group>
+
+<!--&lt;!&ndash;    TODO&ndash;&gt;-->
+<!--    &lt;!&ndash; We do not have a robot connected, so publish fake joint states &ndash;&gt;-->
+<!--    <include file="$(find omnid_moveit_config)/launch/planning_context.launch">-->
+<!--        <arg name="load_robot_description" value="true"/>-->
+<!--    </include>-->
+<!--    <node name="joint_state_publisher" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui">-->
+<!--        <rosparam param="source_list">[omnid/joint_states]</rosparam>-->
+<!--    </node>-->
+<!--    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="true" output="screen" />-->
 
 </launch>
 

@@ -8,7 +8,6 @@ find_package(catkin REQUIRED COMPONENTS
         moveit_ros_planning
         moveit_core
         moveit_ros_planning_interface
-        moveit_visual_tools
         visualization_msgs
         tf2_armadillo
         )

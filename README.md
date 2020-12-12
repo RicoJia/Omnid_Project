@@ -1,11 +1,33 @@
 # Omnid Simulator and Moveit Packages
 
 ### Usage
-Clone this repository into a catkin workspace, then use the rosdep install tool to automatically download its dependencies. 
-Depending on your current version of ROS, use:
-```
-rosdep install --from-paths src --ignore-src -r -y
-```
+1. Create workspace
+      ``` shell script
+        mkdir -p omnid/src
+        cd omnid/src
+        git clone https://github.com/RicoJia/Omnid_Project.git
+        cd .. 
+   ```
+2. Build a docker container and start it(Please use this dockerfile as it contains the latest dependencies we need)
+   - Build the image
+      ```
+            cp src/Omnid_Project/docker_setup/dockint .
+            cp src/Omnid_Project/docker_setup/Dockerfile .
+            ./dockint from omnid $(pwd)/src/Omnid_Project/docker_setup
+       ``` 
 
-This is particularly useful for downloading moveit_visual_tools since as of November 10, 2020, it's not
-available on apt.  
+   - Build a container
+      ``` 
+        ./dockint start omnid $(pwd)
+        ./dockint run omnid bash
+      ```   
+3. Pull Dependencies
+    
+4. Build the package in the docker  
+   - ```source ros_settings.bash``` this will setup some initial settings 
+   - ```catkin build``` build this package
+   - ```source devel/setup.bash```   Source the workspace
+   - ```roslaunch omnid omnid.launch ``` Launch the project
+   - Have fun planning!
+
+

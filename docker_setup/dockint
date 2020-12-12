@@ -1,0 +1,172 @@
+#!/usr/bin/env bash
+usage=\
+"Usage: dockint from <base_image>  [PATH/URL]
+    or: dockint start <base_image> [homedir]
+    or: dockint stop <base_image>
+    or: dockint run <base_image> <cmd>
+    Work interactively with a docker container as if it's environment were on the host system.
+    You work as your current user, all devices are available, and ports running in the container are shared with the host.
+    
+    1. from <base_image>  [PATH/URL] : build a docker container starting with the provided image (e.g ubuntu:focal)
+                                         If PATH/URL is specified, base_image will be built from the provided Dockerfile and context.
+    2. start <base_image> [homedir]    : start the docker container, mounting homedir as your home directory (this defaults to /home/user/image)
+    3. stop <base_image>               : stop the docker container
+    4. run <base_image> <cmd>          : run the command specified by <cmd> in the container corresponding to <image>.
+       For example, bash or zsh (which will be launched interactively).
+       If the container has not been built in will be built.
+       If the container has not been started it will be started with a default home directory of ~/dockerhome if it exists.
+       The container follows the naming pattern ${base_image}_dockint, but can be directly specified by setting the container environment variable:
+       container=containername dockint start base_image
+    The image that is used is called ${base_image}_img but can be overrident by setting the image environment variable
+"
+
+dockerfile=\
+'ARG BASE=ubuntu:focal
+FROM $BASE
+# Make Xwindows work with the native x server and qt
+ENV DISPLAY=:0
+ENV QT_X11_NO_MITSHM=1
+# Get the user id from the host system
+# These args are passed at build time
+# and set up the docker container to have the same
+# users as the host system
+ARG UNAME=ricojia
+ARG UID=1000
+ARG GID=1000
+# create a normal user called "$USER"
+RUN groupadd -f -g $GID $UNAME
+RUN id -u $UNAME || useradd -m -u $UID -g $GID -s /bin/bash $UNAME
+# change to the desired user
+USER $UNAME
+WORKDIR /home/$UNAME'
+
+
+# determine if we need to use sudo when calling docker
+if groups $USER | grep -q docker;
+then
+    DOCKER=docker
+else
+    DOCKER="sudo docker"
+fi    
+
+# set the base image name
+base_image=$2
+
+if [ -z "$base_image" ]
+then
+    printf "$usage"
+    exit 1
+fi
+
+if [ -z $image ]
+then
+    image="${base_image}_img"
+fi
+    
+cmd=$3
+
+# name of dockerfile to build(where applicable)
+dfile=$3
+#home directory to mount (where applicable)
+homedir=$3
+if [ -z $container ]
+then
+    container="${base_image}_dockint"
+fi
+
+# build the docker image
+function docker_build_image {
+    if [ ! -z $dfile ]
+    then
+        $DOCKER build --tag $base_image $dfile
+    fi
+    
+    printf "$dockerfile" | $DOCKER build --build-arg UID=$(id -u) --build-arg GID=$(id -g) --build-arg UNAME=$USER --build-arg BASE=$base_image --tag "$image" - 
+    if [ $? -ne 0 ]; then
+        echo "Failed to create docker image $image."
+        exit 1
+    fi
+}
+
+# start the docker container
+function docker_container_start {
+    # run docker, giving it access to the specified devices and X windows
+    # the cap-add and security-opt lets me use gdb to debug ros nodes
+    # if $homedir does not exist, nothing will be mounted but the command will
+    # still work
+    xhost +local:root
+    $DOCKER run -itd --rm --name "$container" \
+         --hostname "$HOST" \
+         -v $homedir:/home/$USER \
+         -v /tmp/.X11-unix/X0:/tmp/.X11-unix/X0 \
+         -v /etc/machine-id:/etc/machine-id \
+         -v /var/run/dbus:/var/run/dbus \
+         --device /dev/dri \
+         --cap-add=SYS_PTRACE \
+         --security-opt seccomp=unconfined \
+         --privileged \
+         --network=host \
+         -v /dev/:/dev \
+         -v $XDG_RUNTIME_DIR:$XDG_RUNTIME_DIR \
+         -e XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR \
+         "$image"
+
+    if [ $? -ne 0 ]; then
+        echo "Failed to start docker container $container."
+        exit 1
+    fi
+#	$DOCKER exec -ti "$container" sh -c "rosdep install --from-paths src --ignore-src -r -y"
+}
+
+
+function interactive_start {
+    # check if the docker image has been created and if not create one
+    if [ -z "$($DOCKER images -q $base_image)" ]; then
+        docker_build_image
+    fi
+
+    # check if the docker image is running and if not start it
+    if [ -z "$($DOCKER ps -q -f NAME=$container)" ]; then
+        if [ -z $homedir ]; then
+            homedir=~/$base_image
+        fi
+        if [ ! -d $homedir ]; then
+            echo "The directory $homedir, to be mounted in the container at /home/$USER, does not exist."
+            read -r -p "Would you like to create it [y/N]? (Otherwise /home/$USER will be mounted in the container) " response
+            case "$response" in
+                [yY])
+                    mkdir -p $homedir
+                    ;;
+                *)
+                    # docker creates non-existant directories automatically, so set this to empty to prevent that
+                    homedir=""
+            esac
+        fi
+        docker_container_start
+    fi
+}
+
+case $1 in
+    from)
+        docker_build_image
+        exit 0
+        ;;
+    start)
+        interactive_start
+        exit 0
+        ;;
+    stop)
+        $DOCKER stop "$container"
+        exit $?
+        ;;
+    run)
+        # issue a command in the container
+        interactive_start
+        shift 2
+        $DOCKER exec -ti "$container" $@
+        ;;
+    *)
+        printf "$usage"
+        exit 0
+        ;;
+esac
