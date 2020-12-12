@@ -71,8 +71,8 @@ As a universal way to setup the workspace,
 4. Build the package in the docker container  
    - ```source /opt/ros/noetic/setup.bash``` this will setup some initial settings 
    - ```catkin build``` build this package
-   - ```source src/Omnid_Project/docker_setup/ros_settings.bash```   Source ros settings
    - ```source devel/setup.bash``` Source the workspace
+   - ```source src/Omnid_Project/docker_setup/ros_settings.bash```   Source ros settings
    - ```roslaunch omnid omnid.launch ``` Launch the project
    - Have fun planning!
 
