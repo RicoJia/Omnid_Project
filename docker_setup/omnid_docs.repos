@@ -1,0 +1,45 @@
+repositories:
+  cmakeme:
+    type: git
+    url: https://github.com/omnid/cmakeme.git
+    version: master
+  nuhal:
+    type: git
+    url: https://github.com/omnid/nuhal.git
+    version: master
+  omnid_core:
+    type: git
+    url: https://github.com/omnid/omnid_core.git
+    version: master
+  omnid_docs:
+    type: git
+    url: https://github.com/omnid/omnid_docs.git
+    version: master
+  omnid_firmware:
+    type: git
+    url: https://github.com/omnid/omnid_firmware.git
+    version: master
+  omnid_lib:
+    type: git
+    url: https://github.com/omnid/omnid_lib.git
+    version: master
+  omnid_setup:
+    type: git
+    url: https://github.com/omnid/omnid_setup.git
+    version: master
+  omnid_tools:
+    type: git
+    url: https://github.com/omnid/omnid_tools.git
+    version: master
+  tiva_cmake:
+    type: git
+    url: https://github.com/omnid/tiva_cmake.git
+    version: master
+  tivaboot:
+    type: git
+    url: https://github.com/omnid/tivaboot.git
+    version: master
+  rosnu:
+    type: git
+    url: https://github.com/omnid/rosnu.git
+    version: master
