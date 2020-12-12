@@ -4,16 +4,18 @@
 This is the main repository of an Omnid group simulator and its Moveit! motion planning pipeline. 
 If you haven't done so, check out my [**blog post**](https://ricoruotongjia.medium.com/s-d65d8ffcc73d) for some higher level implementation detals. 
 
+![Hnet-image](https://user-images.githubusercontent.com/39393023/101986502-bfa2c600-3c53-11eb-8a7a-8cc360877151.gif)
+
 There are 3 Delta robots and one object platform in this project. 
 ![1*c-ZS4OG450Jem4atBD1XIQ](https://user-images.githubusercontent.com/39393023/101987475-eebc3600-3c59-11eb-9791-72eb11737a46.png)
+
 The simulator includes: 
  - Robot model, including URDF and PyBullet model 
  - Joint control and joint information output   
  - Torsion springs mounted on each robot as serial elastic actuators
  - Validation of torsion springs.  
-![Screenshot from 2020-12-11 18-48-34](https://user-images.githubusercontent.com/39393023/101987454-cc2a1d00-3c59-11eb-96fb-80ca5ef36e69.png)
 
-![Hnet-image](https://user-images.githubusercontent.com/39393023/101986502-bfa2c600-3c53-11eb-8a7a-8cc360877151.gif)
+![Screenshot from 2020-12-11 18-48-34](https://user-images.githubusercontent.com/39393023/101987454-cc2a1d00-3c59-11eb-96fb-80ca5ef36e69.png)
 
 The motion planning pipeline includes
  - `omnid_moveit_config` a properly configured Moveit! configuration package
@@ -78,6 +80,7 @@ As a universal way to setup the workspace,
 
 
 ### Basic Usage
+On Rviz, 
 1. Click and drag the marker embedded in the object platform to a desired pose
     - If we first start at unachievable poses, we can drag the marker anywhere we want until we reach the first achievable poses.   
     - If we try to reach a valid pose to an unachievable pose, the marker will jump back to the closest valid pose
