@@ -18,8 +18,8 @@ The simulator includes:
 ![Screenshot from 2020-12-11 18-48-34](https://user-images.githubusercontent.com/39393023/101987454-cc2a1d00-3c59-11eb-96fb-80ca5ef36e69.png)
 
 The motion planning pipeline includes
- - `omnid_moveit_config` a properly configured Moveit! configuration package
- - Robot URDF model for Moveit! This is different than the one for PyBullet
+ - `omnid_moveit_config`: a properly configured Moveit! configuration package
+ - Robot URDF model: URDF specifically for Moveit! 
  - Plugins:
    - omnid_move_group_interface: updates robot poses when the object's interactive marker is clicked and dragged
    - omnid_kinematics_plugin: IK plugin for a single delta robot
