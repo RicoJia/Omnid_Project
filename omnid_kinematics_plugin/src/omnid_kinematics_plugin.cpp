@@ -41,10 +41,11 @@ namespace omnid_kinematics{
 
         // We skip the single DOF joint checking, since we only care about the after spring joints
         // store joint names, joint limits, and the tip info into the IK & FK Chains
-        //TODO - YAML
-        std::string theta_name = "theta";
-        std::string gamma_name = "gamma";
-        std::string beta_name = "beta";
+        ros::NodeHandle nh;
+        std::string theta_name, gamma_name, beta_name;
+        nh.getParam("theta_name", theta_name);
+        nh.getParam("gamma_name", gamma_name);
+        nh.getParam("beta_name", beta_name);
         dimension_ = joint_model_group->getActiveJointModels().size() + joint_model_group->getMimicJointModels().size();
         for (std::size_t i=0; i < joint_model_group->getJointModels().size(); ++i)
         {

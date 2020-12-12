@@ -107,7 +107,7 @@ namespace omnid_planning_adapter_plugin
 
         void initialize(const ros::NodeHandle& /*nh_*/) override
         {
-            nh_ = ros::NodeHandle ("omnid_moveit");
+            nh_ = ros::NodeHandle();
             vector<string> robot_planning_group_names; // each robot (not including the object platform arm) planning group's name in SRDF
             vector<string> robot_names;    //the first part of joint names in URDF.
             string object_platform_name;

@@ -14,16 +14,26 @@ leg_num: 3      #total number of legs
 robot_names: ["robot_1", "robot_2", "robot_3"]  #the first part of joint names in URDF.
 object_name: "object_platform"  #also is the prefix of the object platform's joints in the urdf for moveit
 
-omnid_moveit:
-  #TODO
-  robot_planning_group_names: ["end_effector_arm_1", "end_effector_arm_2", "end_effector_arm_3"]  #each robot (not including the object platform arm) planning group's name in SRDF
-  robot_names: ["robot_1", "robot_2", "robot_3"]  #the first part of joint names in URDF.
-  object_platform_name: "object_platform"
-  group_reference_frame_name: ["object_platform_base"]
-  world_frame_name: "world"
-  floating_world_frame_name: "/floating_world_0" #the name of the first "floating world" name of each robot. please include '/' if there is any. see each robot's URDF
+#omnid_move_group_interface & omnid_planning_adapter_plugin
+world_frame_name: "world"
+body_frame_name_prefix: "robot_"
+floating_world_frame_name: "/floating_world_0" #the name of the first "floating world" name of each robot. please include '/' if there is any. see each robot's URDF
+group_reference_frame_name: "object_platform_base"
+planning_group_prefix: "end_effector_arm_"
+object_platform_planning_group_name: "object_platform_arm"
+object_platform_eef_name: "object_platform_roll_link"
+eef_update_topic_name: "/rviz_moveit_motion_planning_display/robot_interaction_interactive_marker_topic/update"
+eef_update_frame_name: "EE:goal_object_platform_roll_link"
+robot_planning_group_names: ["end_effector_arm_1", "end_effector_arm_2", "end_effector_arm_3"]  #each robot (not including the object platform arm) planning group's name in SRDF
+object_platform_name: "object_platform"
 
- 
+
+#IK plugin
+theta_name: "theta" #see Matt's inverse kinematics pdf
+gamma_name: "gamma" #see Matt's inverse kinematics pdf
+beta_name: "beta"
+
+
 omnid_simulator:
   #Joint Position Controller parameters
   kp : 1

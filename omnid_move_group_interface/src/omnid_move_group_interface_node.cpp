@@ -48,18 +48,6 @@ typedef arma::Mat<double > mat;
 
 namespace omnid_group_planning{
 
-    //TODO
-    using std::cout;
-    using std::endl;
-    void printGeoMsg(const std::string name, const geometry_msgs::TransformStamped& t){
-        auto trans = t.transform;
-        cout<<name<<" Translation: "<<trans.translation.x<<" "<<trans.translation.y<<" "<<trans.translation.z<<endl;
-    }
-    void printGeoMsg(const std::string name, const geometry_msgs::Pose& pose){
-        auto pos = pose.position;
-        cout<<name<<" position: "<<pos.x<<" "<<pos.y<<" "<<pos.z<<endl;
-    }
-
     /// \brief listen to tf2::Transform and return it. An exception will be returned if no tf is heard
     /// \param target_frame: frame we express source frame in.
     /// \param source_frame: frame we want to express in target_frame.
@@ -174,7 +162,7 @@ namespace omnid_group_planning{
 
     private:
         ros::NodeHandle nh_;
-        unsigned int leg_num_;  //number of legs, we are going to number our legs starting from 1.
+        int leg_num_;  //number of legs, we are going to number our legs starting from 1.
         double delta_robot_base_offset_; //This is a hack. we are publishing the world frame pose, but rviz will recognize that as base_frame.
         double object_z_correction_;
         std::vector<std::unique_ptr<Single_Omnid_Planner>> arms_;
@@ -238,19 +226,19 @@ namespace omnid_group_planning{
 
     void Omnid_Group_Planner::initParams()
     {
-        //TODO - Make these yaml params
-        leg_num_ = 3;
-        delta_robot_base_offset_ = 0.046375;
-        world_frame_name_ = "world";
-        body_frame_name_prefix_ = "robot_";
-        body_frame_name_suffix_ = "/floating_world_0";
-        group_reference_frame_name_ = "object_platform_base";
-        planning_group_prefix_ = "end_effector_arm_";
-        object_platform_planning_group_name_ = "object_platform_arm";
-        //TODO
-        object_platform_eef_name_ = "object_platform_roll_link";
-        eef_update_topic_name_ = "/rviz_moveit_motion_planning_display/robot_interaction_interactive_marker_topic/update";
-        eef_update_frame_name_ = "EE:goal_object_platform_roll_link";
+
+        nh_.getParam("leg_num", leg_num_);
+        nh_.getParam("base_offset_", delta_robot_base_offset_);
+        nh_.getParam("world_frame_name", world_frame_name_);
+        nh_.getParam("body_frame_name_prefix", body_frame_name_prefix_);
+        nh_.getParam("floating_world_frame_name", body_frame_name_suffix_);
+        nh_.getParam("group_reference_frame_name", group_reference_frame_name_);
+        nh_.getParam("planning_group_prefix", planning_group_prefix_);
+        nh_.getParam("object_platform_planning_group_name", object_platform_planning_group_name_);
+
+        nh_.getParam("object_platform_eef_name", object_platform_eef_name_);
+        nh_.getParam("eef_update_topic_name", eef_update_topic_name_);
+        nh_.getParam("eef_update_frame_name", eef_update_frame_name_);
 
         double object_clearance, object_thickness, h_platform;
         nh_.getParam("object_clearance", object_clearance);

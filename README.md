@@ -72,7 +72,7 @@ As a universal way to setup the workspace,
    - ```source /opt/ros/noetic/setup.bash``` this will setup some initial settings 
    - ```catkin build``` build this package
    - ```source devel/setup.bash``` Source the workspace
-   - ```source src/Omnid_Project/docker_setup/ros_settings.bash```   Source ros settings
+   - ```source src/Omnid_Project/docker_setup/ros_settings.bash```   Source some correct ros settings that overwrite the previous ones
    - ```roslaunch omnid omnid.launch ``` Launch the project
    - Have fun planning!
 
@@ -88,4 +88,5 @@ On Rviz,
 2. Hit plan to see the plan
 3. Hit plan and execute to execute the plan
     - The simulator will return fail only if the action request from Moveit! is preempted.  
-    This is because Moveit! checks the proximity between the plan and the actual robot TF.  
+    This is because Moveit! checks the proximity between the plan and the actual robot TF. Also it checks if the controller takes
+    too long to execute a path. see `move_group/trajectory_execution/execution_duration_monitoring`
