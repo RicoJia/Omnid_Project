@@ -91,5 +91,8 @@ On Rviz,
     This is because Moveit! checks the proximity between the plan and the actual robot TF. Also it checks if the controller takes
     too long to execute a path. see `move_group/trajectory_execution/execution_duration_monitoring`
     
-### Video Demonstration
-![(https://user-images.githubusercontent.com/39393023/101986502-bfa2c600-3c53-11eb-8a7a-8cc360877151.gif)](https://www.youtube.com/embed/mwzxtJbuQ-Y)
+### External Resources
+1. [**Notes for Developers**](https://docs.google.com/document/d/1iKX31U3NSdvEZ6RA3NsiCXwdtE4my4krcZCF_odcYEk/edit?usp=sharing)
+2. [**Blog Post**](https://ricoruotongjia.medium.com/s-d65d8ffcc73d)
+3. **Video Demonstration**
+[![Screenshot from 2020-12-13 14-03-54](https://user-images.githubusercontent.com/39393023/102022386-22778880-3d4c-11eb-8136-cbd5e864e6c6.png)](https://youtu.be/mwzxtJbuQ-Y)

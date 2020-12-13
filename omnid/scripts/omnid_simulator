@@ -223,8 +223,8 @@ class OmnidGroup:
 if __name__ == "__main__":
     try:
       rospy.init_node("omnid_node")
-      # c = p.connect(p.GUI)    # direct GUI might burn a lot of CPU.
-      c = p.connect(p.DIRECT)
+      c = p.connect(p.GUI)    # direct GUI might burn a lot of CPU.
+      # c = p.connect(p.DIRECT)
       p.setAdditionalSearchPath(pybullet_data.getDataPath())
       p.resetSimulation()
       p.loadURDF("plane.urdf" )  #loads from the root pybullet library
