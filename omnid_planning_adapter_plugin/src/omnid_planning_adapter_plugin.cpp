@@ -115,6 +115,7 @@ namespace omnid_planning_adapter_plugin
             string world_frame_name;
             string floating_world_frame_name; // the name of the first "floating world" name of each robot. please include '/' if there is any. see each robot's URDF
 
+            //TODO
             if (!readRosParamStringVec(robot_planning_group_names, "robot_planning_group_names"))
                 robot_planning_group_names = {"end_effector_arm_1", "end_effector_arm_2", "end_effector_arm_3"};
 

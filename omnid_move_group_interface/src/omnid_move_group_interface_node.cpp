@@ -228,7 +228,7 @@ namespace omnid_group_planning{
     {
 
         nh_.getParam("leg_num", leg_num_);
-        nh_.getParam("base_offset_", delta_robot_base_offset_);
+        nh_.getParam("base_offset", delta_robot_base_offset_);
         nh_.getParam("world_frame_name", world_frame_name_);
         nh_.getParam("body_frame_name_prefix", body_frame_name_prefix_);
         nh_.getParam("floating_world_frame_name", body_frame_name_suffix_);
@@ -244,6 +244,7 @@ namespace omnid_group_planning{
         nh_.getParam("object_clearance", object_clearance);
         nh_.getParam("object_thickness", object_thickness);
         nh_.getParam("h_platform", h_platform);
+        //TODO
         object_z_correction_ = object_clearance + (object_thickness + h_platform)/2.0;
     }
 

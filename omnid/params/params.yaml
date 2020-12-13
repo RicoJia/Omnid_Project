@@ -27,7 +27,6 @@ eef_update_frame_name: "EE:goal_object_platform_roll_link"
 robot_planning_group_names: ["end_effector_arm_1", "end_effector_arm_2", "end_effector_arm_3"]  #each robot (not including the object platform arm) planning group's name in SRDF
 object_platform_name: "object_platform"
 
-
 #IK plugin
 theta_name: "theta" #see Matt's inverse kinematics pdf
 gamma_name: "gamma" #see Matt's inverse kinematics pdf

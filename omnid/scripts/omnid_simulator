@@ -184,8 +184,8 @@ class OmnidGroup:
                 joint_positions = traj.points[i].positions[self.start_indices_in_traj[id] : self.end_indices_in_traj[id]]
                 joint_names = traj_joint_names[self.start_indices_in_traj[id] : self.end_indices_in_traj[id]]
                 joint_names = self.removePrefixList(joint_names, self.robot_names[id])
-                omnid_arm_ros.updateJointStates(joint_names, joint_positions)
-            r = rospy.Rate(1.0/duration )
+                omnid_arm_ros.updateJointStates(joint_names, joint_positions)   #this is how we update our joint commands
+            r = rospy.Rate(1.0/duration)
             r.sleep()
         if success:
             msg = 'Trajectory completed'
@@ -223,7 +223,8 @@ class OmnidGroup:
 if __name__ == "__main__":
     try:
       rospy.init_node("omnid_node")
-      c = p.connect(p.GUI)
+      # c = p.connect(p.GUI)    # direct GUI might burn a lot of CPU.
+      c = p.connect(p.DIRECT)
       p.setAdditionalSearchPath(pybullet_data.getDataPath())
       p.resetSimulation()
       p.loadURDF("plane.urdf" )  #loads from the root pybullet library

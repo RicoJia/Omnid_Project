@@ -137,6 +137,8 @@ namespace omnid_planning_adapter_plugin{
         }
 
         /// \brief calculate the world frame pose of the object platform from a trajectory point and store it.
+        /// \param traj_point - a point that consists of all joint values
+        /// \param tf - next pose of the object platform (to be filled in)
         void calcPlatformPoseTf(const trajectory_msgs::JointTrajectoryPoint& traj_point, tf2::Transform& tf)const
         {
             //read  x, y, z, roll, pitch, yaw as the body frame pose, then convert it to tf2::Transform

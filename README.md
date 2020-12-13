@@ -90,3 +90,6 @@ On Rviz,
     - The simulator will return fail only if the action request from Moveit! is preempted.  
     This is because Moveit! checks the proximity between the plan and the actual robot TF. Also it checks if the controller takes
     too long to execute a path. see `move_group/trajectory_execution/execution_duration_monitoring`
+    
+### Video Demonstration
+<iframe width="560" height="315" src="https://www.youtube.com/embed/mwzxtJbuQ-Y" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
