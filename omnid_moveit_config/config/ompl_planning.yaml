@@ -238,7 +238,7 @@ all_arms:
   projection_evaluator: joints(object_platform/x,object_platform/y)
   longest_valid_segment_fraction: 0.005
 end_effector_arm_1:
-  default_planner_config: None
+  default_planner_config: RRTstar
   planner_configs:
     - AnytimePathShortening
     - SBL
@@ -265,7 +265,7 @@ end_effector_arm_1:
     - SPARS
     - SPARStwo
 end_effector_arm_2:
-  default_planner_config: None
+  default_planner_config: RRTstar
   planner_configs:
     - AnytimePathShortening
     - SBL
@@ -292,7 +292,7 @@ end_effector_arm_2:
     - SPARS
     - SPARStwo
 end_effector_arm_3:
-  default_planner_config: None
+  default_planner_config: RRTstar
   planner_configs:
     - AnytimePathShortening
     - SBL
@@ -319,7 +319,7 @@ end_effector_arm_3:
     - SPARS
     - SPARStwo
 object_platform_eef:
-  default_planner_config: None
+  default_planner_config: RRTstar
   planner_configs:
     - AnytimePathShortening
     - SBL
@@ -346,7 +346,7 @@ object_platform_eef:
     - SPARS
     - SPARStwo
 object_platform_arm:
-  default_planner_config: None
+  default_planner_config: RRTstar
   planner_configs:
     - AnytimePathShortening
     - SBL
