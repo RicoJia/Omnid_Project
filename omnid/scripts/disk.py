@@ -39,6 +39,12 @@ class Disk:
     joint_state_msg.velocity += lin_vel
     joint_state_msg.velocity += an_vel  #an_vel is already Cartesian, but not sure if it's z,y,x
     joint_state_msg.effort += [0,0,0,0,0,0]
+    #TODO
+    joint_state_msg.name = ["x", "y", "z", "roll", "pitch", "yaw"]
+    print("=====")
+    print("pos", pos)
+    print("joint_names: ", self.joint_names)
+    print(joint_state_msg)
     return joint_state_msg
 
 
